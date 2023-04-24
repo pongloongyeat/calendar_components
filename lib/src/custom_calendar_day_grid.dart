@@ -106,7 +106,7 @@ class CustomCalendarDayGrid extends StatelessWidget {
             : startDateIndex.roundToNearest(numberOfColumns, roundUp: false),
         endDateIndex == -1
             ? dates.length
-            : endDateIndex.roundToNearest(numberOfColumns, roundUp: true),
+            : (endDateIndex + 1).roundToNearest(numberOfColumns, roundUp: true),
       );
     }
 
