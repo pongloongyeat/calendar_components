@@ -1,3 +1,4 @@
+import 'package:calendar_components/src/extensions.dart';
 import 'package:flutter/material.dart';
 
 /// The builder signature for a calendar grid item.
@@ -5,24 +6,6 @@ typedef CalendarGridItemBuilder = Widget Function(
   BuildContext context,
   DateTime date,
 );
-
-extension on DateTime {
-  DateTime toMidnight() {
-    return DateTime(year, month, day);
-  }
-
-  DateTime monthOnly() {
-    return copyWith(day: 1).toMidnight();
-  }
-
-  DateTime copyWith({
-    int? year,
-    int? month,
-    int? day,
-  }) {
-    return DateTime(year ?? this.year, month ?? this.month, day ?? this.day);
-  }
-}
 
 extension on int {
   int roundToNearest(
