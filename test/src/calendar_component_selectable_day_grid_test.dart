@@ -37,8 +37,8 @@ void main() {
       expect(
         tester
             .widgetList<WidgetWithMetadata>(find.byType(WidgetWithMetadata))
-            .any((e) => e.metadata),
-        false,
+            .all((e) => !e.metadata),
+        true,
       );
     });
 
@@ -107,8 +107,8 @@ void main() {
       expect(
         tester
             .widgetList<WidgetWithMetadata>(find.byType(WidgetWithMetadata))
-            .any((e) => e.metadata),
-        false,
+            .all((e) => !e.metadata),
+        true,
       );
     });
 

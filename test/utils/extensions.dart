@@ -18,3 +18,23 @@ extension RandomExtensions on Random {
     return min + nextInt(inclusiveMax - min);
   }
 }
+
+extension IterableExtensions<E> on Iterable<E> {
+  /// Checks whether all elements of this iterable satisfies [test].
+  ///
+  /// Checks every element in iteration order, and returns `false` if
+  /// any of them make [test] return `false`, otherwise returns true.
+  ///
+  /// Example:
+  /// ```dart
+  /// final numbers = <int>[1, 2, 3, 5, 6, 7];
+  /// var result = numbers.all((element) => element >= 5); // false;
+  /// result = numbers.all((element) => element <= 10); // true;
+  /// ```
+  bool all(bool Function(E element) test) {
+    for (E element in this) {
+      if (!test(element)) return false;
+    }
+    return true;
+  }
+}
