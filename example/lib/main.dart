@@ -58,16 +58,20 @@ class MyHomePage extends StatelessWidget {
           const horizontalPadding = 18.0;
           final itemExtent = (constraints.maxWidth - 2 * horizontalPadding) /
               DateTime.daysPerWeek;
-          final startDate = DateTime.now();
-          final endDate = DateTime(startDate.year - 1);
-          final numberOfMonths = DateUtils.monthDelta(endDate, startDate).abs();
+
+          final now = DateTime.now();
+          final startDate = DateTime(now.year - 1);
+          final endDate =
+              DateTime(now.year, now.month).lastDateOfCurrentMonth();
+          final numberOfMonths =
+              DateUtils.monthDelta(endDate, startDate).abs() + 1;
 
           return Column(
             children: [
               Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: horizontalPadding),
-                child: CustomCalendarBuilderHeader(
+                child: CustomCalendarHeader(
                   itemBuilder: (context, day) => Container(
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     width: itemExtent,
@@ -84,9 +88,9 @@ class MyHomePage extends StatelessWidget {
               ),
               Expanded(
                 child: ListView.separated(
+                  reverse: true,
                   itemBuilder: (context, index) {
-                    final month =
-                        DateTime(startDate.year, startDate.month - index);
+                    final month = DateTime(endDate.year, endDate.month - index);
 
                     return PartialCalendarDayGrid(
                       itemExtent: itemExtent,
@@ -166,15 +170,16 @@ class PartialCalendarDayGrid extends StatelessWidget {
             showOverflowedWeeks: false,
             itemBuilder: (context, date) {
               final isDateAvailable = this.isDateAvailable?.call(date) ?? true;
-              final shouldShowDate =
-                  date.isAfter(endDate) || date.isBefore(startDate);
+              final shouldShowDate = (date.isAtSameMomentAs(startDate) ||
+                      date.isAfter(startDate)) &&
+                  (date.isAtSameMomentAs(endDate) || date.isBefore(endDate));
 
               return Container(
                 padding: const EdgeInsets.symmetric(vertical: 13),
                 width: itemExtent,
                 child: Center(
                   child: Text(
-                    shouldShowDate ? '' : '${date.day}',
+                    shouldShowDate ? '${date.day}' : '',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontWeight: FontWeight.w700,

@@ -7,7 +7,7 @@ import '../utils/tester_helper_widget.dart';
 void main() {
   group('CustomCalendarBuilderHeader', () {
     final widget = TesterHelperWidget(
-      child: CustomCalendarBuilderHeader(
+      child: CustomCalendarHeader(
         itemBuilder: (context, day) => Text(day.name),
       ),
     );
