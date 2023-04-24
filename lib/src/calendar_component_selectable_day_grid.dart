@@ -44,6 +44,7 @@ class CalendarComponentSelectableDayGrid extends StatelessWidget {
       currentMonth: currentMonth,
       startDate: startDate,
       endDate: endDate,
+      showOverflowedWeeks: showOverflowedWeeks,
       itemBuilder: (context, date) {
         final selectedDates = this.selectedDates ?? [];
 
