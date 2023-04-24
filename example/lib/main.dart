@@ -112,7 +112,7 @@ class MyHomePage extends StatelessWidget {
   }
 }
 
-class PartialCalendarDayGrid extends StatelessWidget {
+class PartialCalendarDayGrid extends StatefulWidget {
   const PartialCalendarDayGrid({
     super.key,
     double? horizontalPadding,
@@ -146,15 +146,22 @@ class PartialCalendarDayGrid extends StatelessWidget {
   ];
 
   @override
+  State<PartialCalendarDayGrid> createState() => _PartialCalendarDayGridState();
+}
+
+class _PartialCalendarDayGridState extends State<PartialCalendarDayGrid> {
+  DateTime? _selectedDate;
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding:
-              EdgeInsets.only(top: 16, bottom: 12, left: horizontalPadding),
+          padding: EdgeInsets.only(
+              top: 16, bottom: 12, left: widget.horizontalPadding),
           child: Text(
-            '${months[currentMonth.month - 1]} ${currentMonth.year}',
+            '${PartialCalendarDayGrid.months[widget.currentMonth.month - 1]} ${widget.currentMonth.year}',
             style: const TextStyle(
               fontWeight: FontWeight.w700,
               fontSize: 16,
@@ -162,30 +169,58 @@ class PartialCalendarDayGrid extends StatelessWidget {
           ),
         ),
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-          child: CalendarComponentDayGrid(
-            currentMonth: currentMonth,
-            startDate: startDate,
-            endDate: endDate,
+          padding: EdgeInsets.symmetric(horizontal: widget.horizontalPadding),
+          child: CalendarComponentSelectableDayGrid.single(
+            selectedDate: _selectedDate,
+            currentMonth: widget.currentMonth,
+            startDate: widget.startDate,
+            endDate: widget.endDate,
             showOverflowedWeeks: false,
-            itemBuilder: (context, date) {
-              final isDateAvailable = this.isDateAvailable?.call(date) ?? true;
-              final shouldShowDate = (date.isAtSameMomentAs(startDate) ||
-                      date.isAfter(startDate)) &&
-                  (date.isAtSameMomentAs(endDate) || date.isBefore(endDate));
+            itemBuilder: (context, date, isSelected) {
+              final isDateAvailable =
+                  widget.isDateAvailable?.call(date) ?? true;
+              final shouldShowDate = (date.isAtSameMomentAs(widget.startDate) ||
+                      date.isAfter(widget.startDate)) &&
+                  (date.isAtSameMomentAs(widget.endDate) ||
+                      date.isBefore(widget.endDate));
+              final selectedDecoration = BoxDecoration(
+                color: Theme.of(context).primaryColor,
+                borderRadius: BorderRadius.circular(16),
+              );
 
-              return Container(
-                padding: const EdgeInsets.symmetric(vertical: 13),
-                width: itemExtent,
-                child: Center(
-                  child: Text(
-                    shouldShowDate ? '${date.day}' : '',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      color: Color(isDateAvailable ? 0xff252525 : 0xffb0b0b0),
-                      decoration:
-                          isDateAvailable ? null : TextDecoration.lineThrough,
+              final dayWidget = Center(
+                child: shouldShowDate
+                    ? Text(
+                        '${date.day}',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: isSelected
+                              ? Colors.white
+                              : isDateAvailable
+                                  ? const Color(0xff252525)
+                                  : const Color(0xffb0b0b0),
+                          decoration: isDateAvailable
+                              ? null
+                              : TextDecoration.lineThrough,
+                        ),
+                      )
+                    : Container(),
+              );
+
+              return GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: shouldShowDate
+                    ? () => setState(() => _selectedDate = date)
+                    : null,
+                child: SizedBox(
+                  width: widget.itemExtent,
+                  height: widget.itemExtent,
+                  child: Padding(
+                    padding: const EdgeInsets.all(6),
+                    child: Container(
+                      decoration: isSelected ? selectedDecoration : null,
+                      child: dayWidget,
                     ),
                   ),
                 ),
