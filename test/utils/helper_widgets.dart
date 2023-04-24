@@ -15,3 +15,19 @@ class TesterHelperWidget extends StatelessWidget {
     );
   }
 }
+
+class WidgetWithMetadata<T> extends StatelessWidget {
+  const WidgetWithMetadata({
+    super.key,
+    required this.metadata,
+    required this.child,
+  });
+
+  final T metadata;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return child;
+  }
+}

@@ -2,7 +2,7 @@ import 'package:calendar_components/calendar_components.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../utils/tester_helper_widget.dart';
+import '../utils/helper_widgets.dart';
 
 void main() {
   group('CalendarComponentDayGrid', () {
