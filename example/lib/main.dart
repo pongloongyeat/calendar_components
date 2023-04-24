@@ -1,4 +1,4 @@
-import 'package:custom_calendar_builder/custom_calendar_builder.dart';
+import 'package:calendar_components/calendar_components.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -71,7 +71,7 @@ class MyHomePage extends StatelessWidget {
               Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: horizontalPadding),
-                child: CustomCalendarHeader(
+                child: CalendarComponentHeader(
                   itemBuilder: (context, day) => Container(
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     width: itemExtent,
@@ -163,7 +163,7 @@ class PartialCalendarDayGrid extends StatelessWidget {
         ),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-          child: CustomCalendarDayGrid(
+          child: CalendarComponentDayGrid(
             currentMonth: currentMonth,
             startDate: startDate,
             endDate: endDate,

@@ -17,8 +17,8 @@ enum GregorianCalendarDay {
   saturday
 }
 
-class CustomCalendarHeader extends StatelessWidget {
-  const CustomCalendarHeader({
+class CalendarComponentHeader extends StatelessWidget {
+  const CalendarComponentHeader({
     super.key,
     required this.itemBuilder,
   });

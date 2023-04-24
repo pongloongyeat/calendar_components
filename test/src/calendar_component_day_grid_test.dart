@@ -1,17 +1,17 @@
-import 'package:custom_calendar_builder/custom_calendar_builder.dart';
+import 'package:calendar_components/calendar_components.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../utils/tester_helper_widget.dart';
 
 void main() {
-  group('CustomCalendarDayGrid', () {
+  group('CalendarComponentDayGrid', () {
     final currentMonth = DateTime(2023, 4);
     final startDate = DateTime(2023, 4);
     final endDate = DateTime(2023, 4, 30);
 
     final widget = TesterHelperWidget(
-      child: CustomCalendarDayGrid(
+      child: CalendarComponentDayGrid(
         currentMonth: currentMonth,
         startDate: startDate,
         endDate: endDate,
@@ -69,7 +69,7 @@ void main() {
       const numberOfDays = numberOfWeeks * DateTime.daysPerWeek;
 
       final widget = TesterHelperWidget(
-        child: CustomCalendarDayGrid(
+        child: CalendarComponentDayGrid(
           currentMonth: currentMonth,
           startDate: startDate,
           endDate: endDate,
@@ -91,7 +91,7 @@ void main() {
       final endDate = DateTime(2023, 4, 30);
 
       final widget = TesterHelperWidget(
-        child: CustomCalendarDayGrid(
+        child: CalendarComponentDayGrid(
           currentMonth: currentMonth,
           startDate: startDate,
           endDate: endDate,

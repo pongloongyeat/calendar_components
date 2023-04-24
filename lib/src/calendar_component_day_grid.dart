@@ -34,8 +34,8 @@ extension on int {
   }
 }
 
-class CustomCalendarDayGrid extends StatelessWidget {
-  CustomCalendarDayGrid({
+class CalendarComponentDayGrid extends StatelessWidget {
+  CalendarComponentDayGrid({
     super.key,
     required DateTime currentMonth,
     required this.startDate,
