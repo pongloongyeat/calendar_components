@@ -57,5 +57,51 @@ void main() {
         );
       }
     });
+
+    testWidgets(
+        'does not show overflowed weeks if showOverflowedWeeks is false',
+        (tester) async {
+      final currentMonth = DateTime(2023, 4);
+      final startDate = DateTime(2023, 4, 14);
+      final endDate = DateTime(2023, 4, 26);
+
+      const numberOfWeeks = 3;
+      const numberOfDays = numberOfWeeks * DateTime.daysPerWeek;
+
+      final widget = TesterHelperWidget(
+        child: CustomCalendarDayGrid(
+          currentMonth: currentMonth,
+          startDate: startDate,
+          endDate: endDate,
+          showOverflowedWeeks: false,
+          itemBuilder: (context, date) => Text('${date.day}'),
+        ),
+      );
+
+      await tester.pumpWidget(widget);
+      expect(find.byType(Text), findsNWidgets(numberOfDays));
+    });
+
+    testWidgets(
+        'shows all dates if showOverflowedWeeks is false but start and '
+        'end dates fall on the first and last days of the grid',
+        (tester) async {
+      final currentMonth = DateTime(2023, 4);
+      final startDate = DateTime(2023, 4);
+      final endDate = DateTime(2023, 4, 30);
+
+      final widget = TesterHelperWidget(
+        child: CustomCalendarDayGrid(
+          currentMonth: currentMonth,
+          startDate: startDate,
+          endDate: endDate,
+          showOverflowedWeeks: false,
+          itemBuilder: (context, date) => Text('${date.day}'),
+        ),
+      );
+
+      await tester.pumpWidget(widget);
+      expect(find.byType(Text), findsNWidgets(42));
+    });
   });
 }
