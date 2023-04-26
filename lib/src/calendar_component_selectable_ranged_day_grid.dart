@@ -19,6 +19,87 @@ extension on DateTime {
   }
 }
 
+/// An enum describing which end of the connected date in the
+/// [CalendarComponentRangedSelectableDayGrid] that an item is connected to. For
+/// example,
+///
+/// {@template RangedDateConnection.example}
+/// ```
+/// M  T  W  T  F  S  S
+/// ====================
+/// 1  2  3  4  S  x  x
+///             ^
+///       startConnected
+/// x  x  S  11 12 13 14
+///       ^
+/// endConnected
+/// ====================
+/// ```
+///
+/// If only one date is chosen, this corresponds to an unconnected end.
+/// Referring to the example above,
+///
+/// ```
+/// M  T  W  T  F  S  S
+/// ====================
+/// 1  2  3  4  S  6  7
+///             ^
+///           start
+/// 8  9  10 11 12 13 14
+/// ====================
+/// ```
+///
+/// where `S` indicates a selected end and `x` its in between items.
+/// {@endtemplate}
+enum RangedDateConnection {
+  start,
+  startConnected,
+  endConnected;
+
+  /// Describes if the connection is connected.
+  bool get isConnected =>
+      this == RangedDateConnection.startConnected ||
+      this == RangedDateConnection.endConnected;
+}
+
+/// An enum describing the state of an item in between two dates at either end
+/// of the grid. For example,
+///
+/// {@template InBetweenConnection.example}
+/// ```
+/// M  T  W  T  F  S  S
+/// ====================
+/// 1  2  3  4  S  x  x
+///                ^  ^
+///         notBroken |
+///                   |
+///                  end
+/// x  x  S  11 12 13 14
+/// ^
+/// start
+/// ====================
+/// ```
+///
+/// where `S` indicates a selected end and `x` its in between items.
+/// {@endtemplate}
+enum InBetweenConnection {
+  start,
+  notBroken,
+  end;
+
+  static InBetweenConnection fromIndex(int index) {
+    if (index % DateTime.daysPerWeek == 0) {
+      return InBetweenConnection.start;
+    }
+
+    if (index % DateTime.daysPerWeek == DateTime.daysPerWeek - 1) {
+      return InBetweenConnection.end;
+    }
+
+    return InBetweenConnection.notBroken;
+  }
+}
+
 /// A ranged selectable day grid of a calendar which allows for the selection
 /// of a range of dates. This widget is composed of [CalendarComponentDayGrid].
 /// This widget is a [StatelessWidget] and only forms as a basis for you to use
@@ -39,8 +120,6 @@ class CalendarComponentRangedSelectableDayGrid extends StatelessWidget {
     DateTime? selectedEndDate,
     required this.currentMonth,
     required this.itemBuilder,
-    required this.selectedItemBuilder,
-    required this.inBetweenItemBuilder,
   })  : selectedStartDate = selectedStartDate?.toMidnight(),
         selectedEndDate = selectedEndDate?.toMidnight(),
         showOverflowedWeeks = true,
@@ -56,8 +135,6 @@ class CalendarComponentRangedSelectableDayGrid extends StatelessWidget {
     required DateTime this.startDate,
     required DateTime this.endDate,
     required this.itemBuilder,
-    required this.selectedItemBuilder,
-    required this.inBetweenItemBuilder,
   })  : selectedStartDate = selectedStartDate?.toMidnight(),
         selectedEndDate = selectedEndDate?.toMidnight(),
         showOverflowedWeeks = false;
@@ -81,38 +158,31 @@ class CalendarComponentRangedSelectableDayGrid extends StatelessWidget {
   final bool showOverflowedWeeks;
 
   /// {@macro CalendarComponentDayGrid.itemBuilder}
-  final CalendarGridItemBuilder itemBuilder;
-
-  /// The builder for a selected item in the day grid.
   ///
   /// {@macro CalendarComponentDayGrid.itemBuilderDisclaimer}
   ///
-  /// This builder signifies that the current item being built is
-  /// [selectedStartDate] and/or [selectedEndDate]. If [isConnected] is true,
-  /// this means that there is a valid date range (i.e. [selectedStartDate] and
-  /// [selectedEndDate] are not null).
+  /// If `selectedDateConnection` is not null, this means that there is one or
+  /// more selected dates. For example,
+  ///
+  /// {@macro RangedDateConnection.example}
+  ///
+  /// If `inBetweenConnection` is not null, this indicates that the date being built is
+  /// on one end of the calendar's grid. For example,
+  ///
+  /// {@macro InBetweenConnection.example}
   final Widget Function(
     BuildContext context,
     DateTime date,
-    bool isConnected,
-  ) selectedItemBuilder;
-
-  /// The builder for an item in between [selectedStartDate] and
-  /// [selectedEndDate] in the day grid.
-  ///
-  /// {@macro CalendarComponentDayGrid.itemBuilderDisclaimer}
-  ///
-  /// This builder signifies that the current item being built is between
-  /// [selectedStartDate] and [selectedEndDate] and that there is a valid date
-  /// range (i.e. [selectedStartDate] and [selectedEndDate] are not null).
-  final CalendarGridItemBuilder inBetweenItemBuilder;
+    RangedDateConnection? selectedDateConnection,
+    InBetweenConnection? inBetweenConnection,
+  ) itemBuilder;
 
   @override
   Widget build(BuildContext context) {
     if (showOverflowedWeeks) {
       return CalendarComponentDayGrid.overflow(
         currentMonth: currentMonth,
-        itemBuilder: itemBuilder,
+        itemBuilder: _itemBuilder,
       );
     }
 
@@ -124,7 +194,7 @@ class CalendarComponentRangedSelectableDayGrid extends StatelessWidget {
     );
   }
 
-  Widget _itemBuilder(BuildContext context, DateTime date) {
+  Widget _itemBuilder(BuildContext context, DateTime date, int index) {
     var selectedStartDate = this.selectedStartDate;
     var selectedEndDate = this.selectedEndDate;
 
@@ -139,28 +209,43 @@ class CalendarComponentRangedSelectableDayGrid extends StatelessWidget {
       if (selectedStartDate.isAtSameMomentAs(selectedEndDate) &&
           (date.isAtSameMomentAs(selectedStartDate) ||
               date.isAtSameMomentAs(selectedEndDate))) {
-        return selectedItemBuilder(context, date, false);
+        return itemBuilder(context, date, null, null);
       }
     }
 
     if (selectedStartDate != null && date.isAtSameMomentAs(selectedStartDate)) {
       return selectedEndDate != null
-          ? selectedItemBuilder(context, date, true)
-          : selectedItemBuilder(context, date, false);
+          ? itemBuilder(
+              context,
+              date,
+              RangedDateConnection.startConnected,
+              null,
+            )
+          : itemBuilder(context, date, RangedDateConnection.start, null);
     }
 
     if (selectedEndDate != null && date.isAtSameMomentAs(selectedEndDate)) {
       return selectedStartDate != null
-          ? selectedItemBuilder(context, date, true)
-          : selectedItemBuilder(context, date, false);
+          ? itemBuilder(
+              context,
+              date,
+              RangedDateConnection.endConnected,
+              null,
+            )
+          : itemBuilder(context, date, RangedDateConnection.start, null);
     }
 
     if (selectedStartDate != null &&
         selectedEndDate != null &&
         date.isInBetween(selectedStartDate, selectedEndDate, strict: false)) {
-      return inBetweenItemBuilder(context, date);
+      return itemBuilder(
+        context,
+        date,
+        null,
+        InBetweenConnection.fromIndex(index),
+      );
     }
 
-    return itemBuilder(context, date);
+    return itemBuilder(context, date, null, null);
   }
 }

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 typedef CalendarGridItemBuilder = Widget Function(
   BuildContext context,
   DateTime date,
+  int index,
 );
 
 extension on int {
@@ -251,7 +252,7 @@ class CalendarComponentDayGrid extends StatelessWidget {
         rowChildren.clear();
       }
 
-      rowChildren.add(itemBuilder(context, date));
+      rowChildren.add(itemBuilder(context, date, i));
     }
 
     columnChildren.add(

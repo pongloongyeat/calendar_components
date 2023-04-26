@@ -3,6 +3,13 @@ import 'package:calendar_components/src/calendar_component_selectable_ranged_day
 import 'package:calendar_components/src/extensions.dart';
 import 'package:flutter/material.dart';
 
+/// The builder signature for a selectable calendar grid item.
+typedef CalendarGridSelectableItemBuilder = Widget Function(
+  BuildContext context,
+  DateTime date,
+  bool isSelected,
+);
+
 /// A selectable day grid of a calendar which allows for the selection of only
 /// one date. This widget is composed of [CalendarComponentDayGrid]. This
 /// widget is a [StatelessWidget] and only forms as a basis for you to use in a
@@ -24,7 +31,6 @@ class CalendarComponentSingleSelectableDayGrid extends StatelessWidget {
     DateTime? selectedDate,
     required this.currentMonth,
     required this.itemBuilder,
-    required this.selectedItemBuilder,
   })  : selectedDate = selectedDate?.toMidnight(),
         showOverflowedWeeks = true,
         startDate = null,
@@ -38,7 +44,6 @@ class CalendarComponentSingleSelectableDayGrid extends StatelessWidget {
     required DateTime this.startDate,
     required DateTime this.endDate,
     required this.itemBuilder,
-    required this.selectedItemBuilder,
   })  : selectedDate = selectedDate?.toMidnight(),
         showOverflowedWeeks = false;
 
@@ -57,15 +62,10 @@ class CalendarComponentSingleSelectableDayGrid extends StatelessWidget {
   /// {@macro CalendarComponentDayGrid.showOverflowedWeeks}
   final bool showOverflowedWeeks;
 
-  /// {@macro CalendarComponentDayGrid.itemBuilder}
+  /// The builder for a selectable item in the day grid.
   ///
   /// {@macro CalendarComponentDayGrid.itemBuilderDisclaimer}
-  final CalendarGridItemBuilder itemBuilder;
-
-  /// The builder for a selected item in the day grid.
-  ///
-  /// {@macro CalendarComponentDayGrid.itemBuilderDisclaimer}
-  final CalendarGridItemBuilder selectedItemBuilder;
+  final CalendarGridSelectableItemBuilder itemBuilder;
 
   @override
   Widget build(BuildContext context) {
@@ -84,14 +84,14 @@ class CalendarComponentSingleSelectableDayGrid extends StatelessWidget {
     );
   }
 
-  Widget _itemBuilder(BuildContext context, DateTime date) {
+  Widget _itemBuilder(BuildContext context, DateTime date, int index) {
     final selectedDate = this.selectedDate;
 
     if (selectedDate?.isAtSameMomentAs(date) ?? false) {
-      return selectedItemBuilder(context, date);
+      return itemBuilder(context, date, true);
     }
 
-    return itemBuilder(context, date);
+    return itemBuilder(context, date, false);
   }
 }
 
@@ -117,7 +117,6 @@ class CalendarComponentMultipleSelectableDayGrid extends StatelessWidget {
     List<DateTime>? selectedDates,
     required this.currentMonth,
     required this.itemBuilder,
-    required this.selectedItemBuilder,
   })  : selectedDates =
             selectedDates?.map((e) => e.toMidnight()).toList() ?? [],
         showOverflowedWeeks = true,
@@ -132,7 +131,6 @@ class CalendarComponentMultipleSelectableDayGrid extends StatelessWidget {
     required DateTime this.startDate,
     required DateTime this.endDate,
     required this.itemBuilder,
-    required this.selectedItemBuilder,
   })  : selectedDates =
             selectedDates?.map((e) => e.toMidnight()).toList() ?? [],
         showOverflowedWeeks = false;
@@ -152,15 +150,10 @@ class CalendarComponentMultipleSelectableDayGrid extends StatelessWidget {
   /// {@macro CalendarComponentDayGrid.showOverflowedWeeks}
   final bool showOverflowedWeeks;
 
-  /// {@macro CalendarComponentDayGrid.itemBuilder}
+  /// The builder for a selectable item in the day grid.
   ///
   /// {@macro CalendarComponentDayGrid.itemBuilderDisclaimer}
-  final CalendarGridItemBuilder itemBuilder;
-
-  /// The builder for a selected item in the day grid.
-  ///
-  /// {@macro CalendarComponentDayGrid.itemBuilderDisclaimer}
-  final CalendarGridItemBuilder selectedItemBuilder;
+  final CalendarGridSelectableItemBuilder itemBuilder;
 
   @override
   Widget build(BuildContext context) {
@@ -179,11 +172,11 @@ class CalendarComponentMultipleSelectableDayGrid extends StatelessWidget {
     );
   }
 
-  Widget _itemBuilder(BuildContext context, DateTime date) {
+  Widget _itemBuilder(BuildContext context, DateTime date, int index) {
     if (selectedDates.any((e) => e.isAtSameMomentAs(date))) {
-      return selectedItemBuilder(context, date);
+      return itemBuilder(context, date, true);
     }
 
-    return itemBuilder(context, date);
+    return itemBuilder(context, date, false);
   }
 }
