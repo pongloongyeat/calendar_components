@@ -6,68 +6,34 @@ import 'package:flutter_test/flutter_test.dart';
 import '../utils/extensions.dart';
 import '../utils/helper_widgets.dart';
 
-class DateState {
-  DateState({
-    required this.date,
-    required this.state,
-  });
-
-  final DateTime date;
-  final RangedSelectionState state;
-}
-
 void main() {
   group('CalendarComponentSelectableRangedDayGrid', () {
+    final currentMonth = DateTime.now();
+    final startDate = currentMonth.monthOnly();
+    final endDate = currentMonth.lastDateOfCurrentMonth();
+
+    final widget = _buildWidget(
+      currentMonth: currentMonth,
+      startDate: startDate,
+      endDate: endDate,
+    );
+
     testWidgets(
         'does not show selected dates if selectedStartDate and '
         'selectedEndDate are null', (tester) async {
-      final currentMonth = DateTime.now();
-      final startDate = currentMonth.monthOnly();
-      final endDate = currentMonth.lastDateOfCurrentMonth();
-
-      final widget = TesterHelperWidget(
-        child: CalendarComponentSelectableRangedDayGrid(
-          currentMonth: currentMonth,
-          startDate: startDate,
-          endDate: endDate,
-          itemBuilder: (context, date, state) => WidgetWithMetadata(
-            metadata: DateState(date: date, state: state),
-            child: Text('${date.day}'),
-          ),
-        ),
-      );
-
       await tester.pumpWidget(widget);
 
       final items = tester.widgetList<WidgetWithMetadata<DateState>>(
           find.byType(WidgetWithMetadata));
 
       expect(
-        items.all((e) => e.metadata.state == RangedSelectionState.unselected),
+        items.all((e) => e.metadata.state == DateRangeState.unselected),
         true,
       );
     });
 
     testWidgets('shows start date if selectedStartDate is specified',
         (tester) async {
-      final currentMonth = DateTime.now();
-      final startDate = currentMonth.monthOnly();
-      final endDate = currentMonth.lastDateOfCurrentMonth();
-
-      final widget = TesterHelperWidget(
-        child: CalendarComponentSelectableRangedDayGrid(
-          selectedStartDate: startDate,
-          currentMonth: currentMonth,
-          startDate: startDate,
-          endDate: endDate,
-          itemBuilder: (context, date, state) => WidgetWithMetadata(
-            key: ValueKey(date),
-            metadata: DateState(date: date, state: state),
-            child: Text('${date.day}'),
-          ),
-        ),
-      );
-
       await tester.pumpWidget(widget);
 
       final items = tester.widgetList<WidgetWithMetadata<DateState>>(
@@ -75,33 +41,15 @@ void main() {
 
       for (final item in items) {
         if (item.key == ValueKey(startDate)) {
-          expect(item.metadata.state, RangedSelectionState.selectedStart);
+          expect(item.metadata.state, DateRangeState.selected);
         } else {
-          expect(item.metadata.state, RangedSelectionState.unselected);
+          expect(item.metadata.state, DateRangeState.unselected);
         }
       }
     });
 
     testWidgets('shows end date if selectedEndDate is specified',
         (tester) async {
-      final currentMonth = DateTime.now();
-      final startDate = currentMonth.monthOnly();
-      final endDate = currentMonth.lastDateOfCurrentMonth();
-
-      final widget = TesterHelperWidget(
-        child: CalendarComponentSelectableRangedDayGrid(
-          selectedEndDate: endDate,
-          currentMonth: currentMonth,
-          startDate: startDate,
-          endDate: endDate,
-          itemBuilder: (context, date, state) => WidgetWithMetadata(
-            key: ValueKey(date),
-            metadata: DateState(date: date, state: state),
-            child: Text('${date.day}'),
-          ),
-        ),
-      );
-
       await tester.pumpWidget(widget);
 
       final items = tester.widgetList<WidgetWithMetadata<DateState>>(
@@ -109,9 +57,9 @@ void main() {
 
       for (final item in items) {
         if (item.key == ValueKey(endDate)) {
-          expect(item.metadata.state, RangedSelectionState.selectedEnd);
+          expect(item.metadata.state, DateRangeState.selected);
         } else {
-          expect(item.metadata.state, RangedSelectionState.unselected);
+          expect(item.metadata.state, DateRangeState.unselected);
         }
       }
     });
@@ -119,26 +67,15 @@ void main() {
     testWidgets(
         'shows date range if both selectedStartDate and selectedEndDate are '
         'specified', (tester) async {
-      final currentMonth = DateTime.now();
-      final startDate = currentMonth.monthOnly();
-      final endDate = currentMonth.lastDateOfCurrentMonth();
-
       final selectedStartDate = startDate.copyWith(day: startDate.day + 1);
       final selectedEndDate = endDate.copyWith(day: endDate.day - 1);
 
-      final widget = TesterHelperWidget(
-        child: CalendarComponentSelectableRangedDayGrid(
-          selectedStartDate: selectedStartDate,
-          selectedEndDate: selectedEndDate,
-          currentMonth: currentMonth,
-          startDate: startDate,
-          endDate: endDate,
-          itemBuilder: (context, date, state) => WidgetWithMetadata(
-            key: ValueKey(date),
-            metadata: DateState(date: date, state: state),
-            child: Text('${date.day}'),
-          ),
-        ),
+      final widget = _buildWidget(
+        currentMonth: currentMonth,
+        startDate: startDate,
+        endDate: endDate,
+        selectedStartDate: selectedStartDate,
+        selectedEndDate: selectedEndDate,
       );
 
       await tester.pumpWidget(widget);
@@ -150,20 +87,16 @@ void main() {
         if (item.key == ValueKey(startDate) || item.key == ValueKey(endDate)) {
           expect(
             item.metadata.state,
-            RangedSelectionState.unselected,
+            DateRangeState.unselected,
           );
-        } else if (item.key == ValueKey(selectedStartDate)) {
+        } else if (item.key == ValueKey(selectedStartDate) ||
+            item.key == ValueKey(selectedEndDate)) {
           expect(
             item.metadata.state,
-            RangedSelectionState.selectedStartConnected,
-          );
-        } else if (item.key == ValueKey(selectedEndDate)) {
-          expect(
-            item.metadata.state,
-            RangedSelectionState.selectedEndConnected,
+            DateRangeState.selectedConnected,
           );
         } else {
-          expect(item.metadata.state, RangedSelectionState.inBetween);
+          expect(item.metadata.state, DateRangeState.inBetween);
         }
       }
     });
@@ -172,26 +105,15 @@ void main() {
         'shows date range if both selectedStartDate and selectedEndDate are '
         'specified and selectedStartDate and selectedEndDate are swapped',
         (tester) async {
-      final currentMonth = DateTime.now();
-      final startDate = currentMonth.monthOnly();
-      final endDate = currentMonth.lastDateOfCurrentMonth();
-
       final selectedStartDate = startDate.copyWith(day: startDate.day + 1);
       final selectedEndDate = endDate.copyWith(day: endDate.day - 1);
 
-      final widget = TesterHelperWidget(
-        child: CalendarComponentSelectableRangedDayGrid(
-          selectedStartDate: selectedEndDate,
-          selectedEndDate: selectedStartDate,
-          currentMonth: currentMonth,
-          startDate: startDate,
-          endDate: endDate,
-          itemBuilder: (context, date, state) => WidgetWithMetadata(
-            key: ValueKey(date),
-            metadata: DateState(date: date, state: state),
-            child: Text('${date.day}'),
-          ),
-        ),
+      final widget = _buildWidget(
+        currentMonth: currentMonth,
+        startDate: startDate,
+        endDate: endDate,
+        selectedStartDate: selectedStartDate,
+        selectedEndDate: selectedEndDate,
       );
 
       await tester.pumpWidget(widget);
@@ -203,22 +125,64 @@ void main() {
         if (item.key == ValueKey(startDate) || item.key == ValueKey(endDate)) {
           expect(
             item.metadata.state,
-            RangedSelectionState.unselected,
+            DateRangeState.unselected,
           );
-        } else if (item.key == ValueKey(selectedStartDate)) {
+        } else if (item.key == ValueKey(selectedStartDate) ||
+            item.key == ValueKey(selectedEndDate)) {
           expect(
             item.metadata.state,
-            RangedSelectionState.selectedStartConnected,
-          );
-        } else if (item.key == ValueKey(selectedEndDate)) {
-          expect(
-            item.metadata.state,
-            RangedSelectionState.selectedEndConnected,
+            DateRangeState.selectedConnected,
           );
         } else {
-          expect(item.metadata.state, RangedSelectionState.inBetween);
+          expect(item.metadata.state, DateRangeState.inBetween);
         }
       }
     });
   });
+}
+
+enum DateRangeState { unselected, selected, selectedConnected, inBetween }
+
+class DateState {
+  DateState(this.date, this.state);
+
+  final DateTime date;
+  final DateRangeState state;
+}
+
+Widget _buildWidget({
+  required DateTime currentMonth,
+  required DateTime startDate,
+  required DateTime endDate,
+  DateTime? selectedStartDate,
+  DateTime? selectedEndDate,
+}) {
+  return TesterHelperWidget(
+    child: CalendarComponentRangedSelectableDayGrid.noOverflow(
+      currentMonth: currentMonth,
+      startDate: startDate,
+      endDate: endDate,
+      selectedStartDate: selectedStartDate,
+      selectedEndDate: selectedEndDate,
+      itemBuilder: (context, date) => WidgetWithMetadata(
+        key: ValueKey(date),
+        metadata: DateState(date, DateRangeState.unselected),
+        child: Text('${date.day}'),
+      ),
+      selectedItemBuilder: (context, date, isConnected) => WidgetWithMetadata(
+        key: ValueKey(date),
+        metadata: DateState(
+            date,
+            isConnected
+                ? DateRangeState.selectedConnected
+                : DateRangeState.selected),
+        child: Text('${date.day}'),
+      ),
+      inBetweenItemBuilder: (context, date) => WidgetWithMetadata(
+        key: ValueKey(date),
+        metadata: DateState(date, DateRangeState.inBetween),
+        child: Text('${date.day}'),
+      ),
+    ),
+  );
 }

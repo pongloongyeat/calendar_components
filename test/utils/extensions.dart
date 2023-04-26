@@ -1,15 +1,5 @@
 import 'dart:math';
 
-import 'package:calendar_components/src/extensions.dart';
-
-extension DateTimeExtensions on DateTime {
-  DateTime lastDateOfCurrentMonth() {
-    return DateTime(year, month + 1)
-        .subtract(const Duration(days: 1))
-        .toMidnight();
-  }
-}
-
 extension RandomExtensions on Random {
   /// Generates a positive random integer uniformly distributed on the range
   /// from [min], inclusive, to [max], inclusive.

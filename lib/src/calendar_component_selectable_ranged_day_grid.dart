@@ -1,106 +1,150 @@
 import 'package:calendar_components/src/calendar_component_day_grid.dart';
+import 'package:calendar_components/src/calendar_component_selectable_day_grid.dart';
 import 'package:calendar_components/src/extensions.dart';
 import 'package:flutter/material.dart';
 
-typedef CalendarGridRangedItemBuilder = Widget Function(
-  BuildContext context,
-  DateTime date,
-  RangedSelectionState state,
-);
-
-enum RangedSelectionState {
-  unselected,
-  selectedStart,
-  selectedStartConnected,
-  selectedEnd,
-  selectedEndConnected,
-  inBetween;
-
-  bool get isSelected =>
-      this == RangedSelectionState.selectedStart ||
-      this == RangedSelectionState.selectedEnd ||
-      this == RangedSelectionState.selectedStartConnected ||
-      this == RangedSelectionState.selectedEndConnected;
-}
-
-class CalendarComponentSelectableRangedDayGrid extends StatelessWidget {
-  CalendarComponentSelectableRangedDayGrid({
+/// A ranged selectable day grid of a calendar which allows for the selection
+/// of a range of dates. This widget is composed of [CalendarComponentDayGrid].
+/// This widget is a [StatelessWidget] and only forms as a basis for you to use
+/// in a [Widget].
+///
+/// {@macro CalendarComponentDayGrid}
+///
+/// See also:
+/// - [CalendarComponentDayGrid] for a base grid to compose your calendar with.
+/// - [CalendarComponentSingleSelectableDayGrid] and
+/// [CalendarComponentMultipleSelectableDayGrid] for a selectable
+/// [CalendarComponentDayGrid].
+class CalendarComponentRangedSelectableDayGrid extends StatelessWidget {
+  /// Constructs the selectable ranged day grid with overflowed weeks.
+  CalendarComponentRangedSelectableDayGrid.overflow({
     super.key,
     DateTime? selectedStartDate,
     DateTime? selectedEndDate,
     required this.currentMonth,
-    required this.startDate,
-    required this.endDate,
-    this.showOverflowedWeeks = true,
     required this.itemBuilder,
+    required this.selectedItemBuilder,
+    required this.inBetweenItemBuilder,
   })  : selectedStartDate = selectedStartDate?.toMidnight(),
-        selectedEndDate = selectedEndDate?.toMidnight();
+        selectedEndDate = selectedEndDate?.toMidnight(),
+        showOverflowedWeeks = true,
+        startDate = null,
+        endDate = null;
 
+  /// Constructs the selectable ranged day grid with overflowed weeks.
+  CalendarComponentRangedSelectableDayGrid.noOverflow({
+    super.key,
+    DateTime? selectedStartDate,
+    DateTime? selectedEndDate,
+    required this.currentMonth,
+    required DateTime this.startDate,
+    required DateTime this.endDate,
+    required this.itemBuilder,
+    required this.selectedItemBuilder,
+    required this.inBetweenItemBuilder,
+  })  : selectedStartDate = selectedStartDate?.toMidnight(),
+        selectedEndDate = selectedEndDate?.toMidnight(),
+        showOverflowedWeeks = true;
+
+  /// The currently selected start date.
   final DateTime? selectedStartDate;
+
+  /// The currently selected end date.
   final DateTime? selectedEndDate;
+
+  /// {@macro CalendarComponentDayGrid.currentMonth}
   final DateTime currentMonth;
-  final DateTime startDate;
-  final DateTime endDate;
+
+  /// {@macro CalendarComponentDayGrid.startDate}
+  final DateTime? startDate;
+
+  /// {@macro CalendarComponentDayGrid.endDate}
+  final DateTime? endDate;
+
+  /// {@macro CalendarComponentDayGrid.showOverflowedWeeks}
   final bool showOverflowedWeeks;
-  final CalendarGridRangedItemBuilder itemBuilder;
+
+  /// {@macro CalendarComponentDayGrid.itemBuilder}
+  final CalendarGridItemBuilder itemBuilder;
+
+  /// The builder for a selected item in the day grid.
+  ///
+  /// {@macro CalendarComponentDayGrid.itemBuilderDisclaimer}
+  ///
+  /// This builder signifies that the current item being built is
+  /// [selectedStartDate] and/or [selectedEndDate]. If [isConnected] is true,
+  /// this means that there is a valid date range (i.e. [selectedStartDate] and
+  /// [selectedEndDate] are not null).
+  final Widget Function(
+    BuildContext context,
+    DateTime date,
+    bool isConnected,
+  ) selectedItemBuilder;
+
+  /// The builder for an item in between [selectedStartDate] and
+  /// [selectedEndDate] in the day grid.
+  ///
+  /// {@macro CalendarComponentDayGrid.itemBuilderDisclaimer}
+  ///
+  /// This builder signifies that the current item being built is between
+  /// [selectedStartDate] and [selectedEndDate] and that there is a valid date
+  /// range (i.e. [selectedStartDate] and [selectedEndDate] are not null).
+  final CalendarGridItemBuilder inBetweenItemBuilder;
 
   @override
   Widget build(BuildContext context) {
-    return CalendarComponentDayGrid(
+    if (showOverflowedWeeks) {
+      return CalendarComponentDayGrid.overflow(
+        currentMonth: currentMonth,
+        itemBuilder: itemBuilder,
+      );
+    }
+
+    return CalendarComponentDayGrid.noOverflow(
       currentMonth: currentMonth,
-      startDate: startDate,
-      endDate: endDate,
-      showOverflowedWeeks: showOverflowedWeeks,
-      itemBuilder: (context, date) {
-        var selectedStartDate = this.selectedStartDate;
-        var selectedEndDate = this.selectedEndDate;
-
-        // Swap if not ordered correctly.
-        if (selectedStartDate != null && selectedEndDate != null) {
-          if (selectedEndDate.isBefore(selectedStartDate)) {
-            final temp = selectedStartDate;
-            selectedStartDate = selectedEndDate;
-            selectedEndDate = temp;
-          }
-
-          if (selectedStartDate.isAtSameMomentAs(selectedEndDate) &&
-              (date.isAtSameMomentAs(selectedStartDate) ||
-                  date.isAtSameMomentAs(selectedEndDate))) {
-            return itemBuilder(
-                context, date, RangedSelectionState.selectedStart);
-          }
-        }
-
-        if (selectedStartDate != null &&
-            date.isAtSameMomentAs(selectedStartDate)) {
-          return itemBuilder(
-            context,
-            date,
-            selectedEndDate != null
-                ? RangedSelectionState.selectedStartConnected
-                : RangedSelectionState.selectedStart,
-          );
-        }
-
-        if (selectedEndDate != null && date.isAtSameMomentAs(selectedEndDate)) {
-          return itemBuilder(
-            context,
-            date,
-            selectedStartDate != null
-                ? RangedSelectionState.selectedEndConnected
-                : RangedSelectionState.selectedEnd,
-          );
-        }
-
-        if (selectedStartDate != null &&
-            selectedEndDate != null &&
-            date.isInBetween(selectedStartDate, selectedEndDate,
-                strict: false)) {
-          return itemBuilder(context, date, RangedSelectionState.inBetween);
-        }
-
-        return itemBuilder(context, date, RangedSelectionState.unselected);
-      },
+      startDate: startDate!,
+      endDate: endDate!,
+      itemBuilder: _itemBuilder,
     );
+  }
+
+  Widget _itemBuilder(BuildContext context, DateTime date) {
+    var selectedStartDate = this.selectedStartDate;
+    var selectedEndDate = this.selectedEndDate;
+
+    // Swap if not ordered correctly.
+    if (selectedStartDate != null && selectedEndDate != null) {
+      if (selectedEndDate.isBefore(selectedStartDate)) {
+        final temp = selectedStartDate;
+        selectedStartDate = selectedEndDate;
+        selectedEndDate = temp;
+      }
+
+      if (selectedStartDate.isAtSameMomentAs(selectedEndDate) &&
+          (date.isAtSameMomentAs(selectedStartDate) ||
+              date.isAtSameMomentAs(selectedEndDate))) {
+        return selectedItemBuilder(context, date, false);
+      }
+    }
+
+    if (selectedStartDate != null && date.isAtSameMomentAs(selectedStartDate)) {
+      return selectedEndDate != null
+          ? selectedItemBuilder(context, date, true)
+          : selectedItemBuilder(context, date, false);
+    }
+
+    if (selectedEndDate != null && date.isAtSameMomentAs(selectedEndDate)) {
+      return selectedStartDate != null
+          ? selectedItemBuilder(context, date, true)
+          : selectedItemBuilder(context, date, false);
+    }
+
+    if (selectedStartDate != null &&
+        selectedEndDate != null &&
+        date.isInBetween(selectedStartDate, selectedEndDate, strict: false)) {
+      return inBetweenItemBuilder(context, date);
+    }
+
+    return itemBuilder(context, date);
   }
 }

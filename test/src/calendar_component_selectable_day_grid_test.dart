@@ -19,13 +19,19 @@ void main() {
       final endDate = currentMonth.lastDateOfCurrentMonth();
 
       final widget = TesterHelperWidget(
-        child: CalendarComponentSelectableDayGrid.single(
+        child: CalendarComponentSingleSelectableDayGrid.noOverflow(
           currentMonth: currentMonth,
           startDate: startDate,
           endDate: endDate,
-          itemBuilder: (context, date, isSelected) {
+          itemBuilder: (context, date) {
             return WidgetWithMetadata(
-              metadata: isSelected,
+              metadata: false,
+              child: Text('${date.day}'),
+            );
+          },
+          selectedItemBuilder: (context, date) {
+            return WidgetWithMetadata(
+              metadata: true,
               child: Text('${date.day}'),
             );
           },
@@ -51,15 +57,22 @@ void main() {
           day: rand.nextIntBetween(min: 1, max: endDate.day));
 
       final widget = TesterHelperWidget(
-        child: CalendarComponentSelectableDayGrid.single(
+        child: CalendarComponentSingleSelectableDayGrid.noOverflow(
           selectedDate: selectedDate,
           currentMonth: currentMonth,
           startDate: startDate,
           endDate: endDate,
-          itemBuilder: (context, date, isSelected) {
+          itemBuilder: (context, date) {
             return WidgetWithMetadata(
               key: ValueKey(date),
-              metadata: isSelected,
+              metadata: false,
+              child: Text('${date.day}'),
+            );
+          },
+          selectedItemBuilder: (context, date) {
+            return WidgetWithMetadata(
+              key: ValueKey(date),
+              metadata: true,
               child: Text('${date.day}'),
             );
           },
@@ -89,13 +102,21 @@ void main() {
       final endDate = currentMonth.lastDateOfCurrentMonth();
 
       final widget = TesterHelperWidget(
-        child: CalendarComponentSelectableDayGrid.multiple(
+        child: CalendarComponentMultipleSelectableDayGrid.noOverflow(
           currentMonth: currentMonth,
           startDate: startDate,
           endDate: endDate,
-          itemBuilder: (context, date, isSelected) {
+          itemBuilder: (context, date) {
             return WidgetWithMetadata(
-              metadata: isSelected,
+              key: ValueKey(date),
+              metadata: false,
+              child: Text('${date.day}'),
+            );
+          },
+          selectedItemBuilder: (context, date) {
+            return WidgetWithMetadata(
+              key: ValueKey(date),
+              metadata: true,
               child: Text('${date.day}'),
             );
           },
@@ -126,15 +147,22 @@ void main() {
       ];
 
       final widget = TesterHelperWidget(
-        child: CalendarComponentSelectableDayGrid.multiple(
+        child: CalendarComponentMultipleSelectableDayGrid.noOverflow(
           selectedDates: selectedDates,
           currentMonth: currentMonth,
           startDate: startDate,
           endDate: endDate,
-          itemBuilder: (context, date, isSelected) {
+          itemBuilder: (context, date) {
             return WidgetWithMetadata(
               key: ValueKey(date),
-              metadata: isSelected,
+              metadata: false,
+              child: Text('${date.day}'),
+            );
+          },
+          selectedItemBuilder: (context, date) {
+            return WidgetWithMetadata(
+              key: ValueKey(date),
+              metadata: true,
               child: Text('${date.day}'),
             );
           },

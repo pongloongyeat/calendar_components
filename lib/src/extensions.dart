@@ -1,8 +1,10 @@
 extension DateTimeExtensions on DateTime {
+  /// Returns the current [DateTime] at midnight (0000 hrs).
   DateTime toMidnight() {
     return DateTime(year, month, day);
   }
 
+  /// Returns the current [DateTime] on the 1st of the month.
   DateTime monthOnly() {
     return copyWith(day: 1).toMidnight();
   }
@@ -15,7 +17,14 @@ extension DateTimeExtensions on DateTime {
     return DateTime(year ?? this.year, month ?? this.month, day ?? this.day);
   }
 
-  /// Computes a < `this` < b. If strict is false, checking for b < `this` < a
+  /// Returns the last day of the current month.
+  DateTime lastDateOfCurrentMonth() {
+    return DateTime(year, month + 1)
+        .subtract(const Duration(days: 1))
+        .toMidnight();
+  }
+
+  /// Computes `a < this < b.` If strict is false, checking for `b < this < a`
   /// also returns true.
   bool isInBetween(
     DateTime a,

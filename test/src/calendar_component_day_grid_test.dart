@@ -7,14 +7,10 @@ import '../utils/helper_widgets.dart';
 void main() {
   group('CalendarComponentDayGrid', () {
     final currentMonth = DateTime(2023, 4);
-    final startDate = DateTime(2023, 4);
-    final endDate = DateTime(2023, 4, 30);
 
     final widget = TesterHelperWidget(
-      child: CalendarComponentDayGrid(
+      child: CalendarComponentDayGrid.overflow(
         currentMonth: currentMonth,
-        startDate: startDate,
-        endDate: endDate,
         itemBuilder: (context, date) => Text('${date.day}'),
       ),
     );
@@ -69,11 +65,10 @@ void main() {
       const numberOfDays = numberOfWeeks * DateTime.daysPerWeek;
 
       final widget = TesterHelperWidget(
-        child: CalendarComponentDayGrid(
+        child: CalendarComponentDayGrid.noOverflow(
           currentMonth: currentMonth,
           startDate: startDate,
           endDate: endDate,
-          showOverflowedWeeks: false,
           itemBuilder: (context, date) => Text('${date.day}'),
         ),
       );
@@ -91,11 +86,10 @@ void main() {
       final endDate = DateTime(2023, 4, 30);
 
       final widget = TesterHelperWidget(
-        child: CalendarComponentDayGrid(
+        child: CalendarComponentDayGrid.noOverflow(
           currentMonth: currentMonth,
           startDate: startDate,
           endDate: endDate,
-          showOverflowedWeeks: false,
           itemBuilder: (context, date) => Text('${date.day}'),
         ),
       );

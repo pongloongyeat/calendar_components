@@ -17,12 +17,18 @@ enum GregorianCalendarDay {
   saturday
 }
 
+/// {@template CalendarComponentHeader}
+/// The header of a calendar. Typically shown at the top of the calendar.
+/// {@endtemplate}
 class CalendarComponentHeader extends StatelessWidget {
+  /// {@macro CalendarComponentHeader}
   const CalendarComponentHeader({
     super.key,
     required this.itemBuilder,
   });
 
+  /// The builder for each item in the header. Each item refers to each day
+  /// of the week, i.e. each value in [GregorianCalendarDay.values].
   final CalendarHeaderItemBuilder itemBuilder;
 
   @override
