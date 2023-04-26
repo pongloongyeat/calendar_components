@@ -35,7 +35,7 @@ Referring to the example above:
 
 <img src="screenshots/no_overflow.png" height=720/>
 
-Notice that the overflowed week at the bottom has been removed but the overflowed days remain at the top since removing the whole week would mean removing the 1st and 2nd days of the month, which is part of the current month and shouldn't be removed.
+Notice that the overflowed week at the bottom of April has been removed but the overflowed days remain at the top since removing the whole week would mean removing the 1st and 2nd days of the month, which is part of the current month and shouldn't be removed.
 
 ```dart
 final currentMonth = DateTime.now();
