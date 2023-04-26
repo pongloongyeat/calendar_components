@@ -1,3 +1,13 @@
+<!--
+## Version
+### Features
+### Fixes
+### Documenetation
+### Workflow
+### Tests
+### Others
+ -->
+
 ## 0.0.1
 
-* TODO: Describe initial release.
+* Initial pre-release
