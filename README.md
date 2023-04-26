@@ -123,7 +123,8 @@ This is typically useful for showing fade effects/gradients at the extreme ends 
 
 ```dart
 CalendarComponentRangedSelectableDayGrid.overflow(
-  selectedDate: ...,
+  selectedStartDate: ...,
+  selectedEndDate: ...,
   currentMonth: DateTime.now(),
   itemBuilder: (context, date, selectedDateConnection, inBetweenConnection) {
     return GestureDetector(
