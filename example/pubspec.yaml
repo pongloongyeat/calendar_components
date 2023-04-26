@@ -36,6 +36,9 @@ dependencies:
   cupertino_icons: ^1.0.2
   calendar_components:
     path: ../
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.17.0
 
 dev_dependencies:
   flutter_test:
