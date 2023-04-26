@@ -28,7 +28,7 @@ class CalendarComponentSingleSelectableDayGrid extends StatelessWidget {
   /// Constructs the selectable day grid with overflowed weeks.
   CalendarComponentSingleSelectableDayGrid.overflow({
     super.key,
-    DateTime? selectedDate,
+    required DateTime? selectedDate,
     required this.currentMonth,
     required this.itemBuilder,
   })  : selectedDate = selectedDate?.toMidnight(),
@@ -39,7 +39,7 @@ class CalendarComponentSingleSelectableDayGrid extends StatelessWidget {
   /// Constructs the selectable day grid without overflowed weeks.
   CalendarComponentSingleSelectableDayGrid.noOverflow({
     super.key,
-    DateTime? selectedDate,
+    required DateTime? selectedDate,
     required this.currentMonth,
     required DateTime this.startDate,
     required DateTime this.endDate,
@@ -114,7 +114,7 @@ class CalendarComponentMultipleSelectableDayGrid extends StatelessWidget {
   /// Constructs the multiple selectable day grid with overflowed weeks.
   CalendarComponentMultipleSelectableDayGrid.overflow({
     super.key,
-    List<DateTime>? selectedDates,
+    required List<DateTime>? selectedDates,
     required this.currentMonth,
     required this.itemBuilder,
   })  : selectedDates =
@@ -126,7 +126,7 @@ class CalendarComponentMultipleSelectableDayGrid extends StatelessWidget {
   /// Constructs the multiple selectable day grid without overflowed weeks.
   CalendarComponentMultipleSelectableDayGrid.noOverflow({
     super.key,
-    List<DateTime>? selectedDates,
+    required List<DateTime>? selectedDates,
     required this.currentMonth,
     required DateTime this.startDate,
     required DateTime this.endDate,

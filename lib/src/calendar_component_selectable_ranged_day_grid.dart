@@ -116,8 +116,8 @@ class CalendarComponentRangedSelectableDayGrid extends StatelessWidget {
   /// Constructs the selectable ranged day grid with overflowed weeks.
   CalendarComponentRangedSelectableDayGrid.overflow({
     super.key,
-    DateTime? selectedStartDate,
-    DateTime? selectedEndDate,
+    required DateTime? selectedStartDate,
+    required DateTime? selectedEndDate,
     required this.currentMonth,
     required this.itemBuilder,
   })  : selectedStartDate = selectedStartDate?.toMidnight(),
@@ -129,8 +129,8 @@ class CalendarComponentRangedSelectableDayGrid extends StatelessWidget {
   /// Constructs the selectable ranged day grid with overflowed weeks.
   CalendarComponentRangedSelectableDayGrid.noOverflow({
     super.key,
-    DateTime? selectedStartDate,
-    DateTime? selectedEndDate,
+    required DateTime? selectedStartDate,
+    required DateTime? selectedEndDate,
     required this.currentMonth,
     required DateTime this.startDate,
     required DateTime this.endDate,
