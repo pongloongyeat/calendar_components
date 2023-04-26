@@ -74,7 +74,7 @@ extension on int {
 /// If constructed with no overflow (or when [showOverflowedWeeks] is false),
 /// this removes the overflowed weeks where possible.
 ///
-/// Referring to the above example:
+/// Referring to the example above:
 /// ```
 /// M  T  W  T  F  S  S
 /// ====================
@@ -86,7 +86,7 @@ extension on int {
 /// ====================
 /// ```
 ///
-/// Notice that the overflowed week has been removed at the bottom but the
+/// Notice that the overflowed week at the bottom has been removed but the
 /// overflowed days remain at the top since removing the whole week would mean
 /// removing the 1st and 2nd days of the month, which is part of the current
 /// month and shouldn't be removed.
