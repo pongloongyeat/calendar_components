@@ -60,7 +60,7 @@ class CalendarComponentRangedSelectableDayGrid extends StatelessWidget {
     required this.inBetweenItemBuilder,
   })  : selectedStartDate = selectedStartDate?.toMidnight(),
         selectedEndDate = selectedEndDate?.toMidnight(),
-        showOverflowedWeeks = true;
+        showOverflowedWeeks = false;
 
   /// The currently selected start date.
   final DateTime? selectedStartDate;
