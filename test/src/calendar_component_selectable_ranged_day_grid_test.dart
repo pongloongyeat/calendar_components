@@ -1,5 +1,4 @@
 import 'package:calendar_components/calendar_components.dart';
-import 'package:calendar_components/src/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -12,54 +11,76 @@ void main() {
     final startDate = currentMonth.monthOnly();
     final endDate = currentMonth.lastDateOfCurrentMonth();
 
-    final widget = _buildWidget(
-      currentMonth: currentMonth,
-      startDate: startDate,
-      endDate: endDate,
-    );
-
     testWidgets(
         'does not show selected dates if selectedStartDate and '
         'selectedEndDate are null', (tester) async {
-      await tester.pumpWidget(widget);
+      await tester.pumpWidget(
+        _buildWidget(
+          currentMonth: currentMonth,
+          startDate: startDate,
+          endDate: endDate,
+        ),
+      );
 
       final items = tester.widgetList<WidgetWithMetadata<DateState>>(
           find.byType(WidgetWithMetadata));
 
       expect(
-        items.all((e) => e.metadata.state == DateRangeState.unselected),
+        items.all((e) =>
+            e.metadata.rangedDateConnection == null &&
+            e.metadata.inBetweenConnection == null),
         true,
       );
     });
 
     testWidgets('shows start date if selectedStartDate is specified',
         (tester) async {
-      await tester.pumpWidget(widget);
+      await tester.pumpWidget(
+        _buildWidget(
+          currentMonth: currentMonth,
+          startDate: startDate,
+          endDate: endDate,
+          selectedStartDate: DateTime.now(),
+        ),
+      );
 
       final items = tester.widgetList<WidgetWithMetadata<DateState>>(
           find.byType(WidgetWithMetadata));
 
       for (final item in items) {
         if (item.key == ValueKey(startDate)) {
-          expect(item.metadata.state, DateRangeState.selected);
+          expect(
+            item.metadata.rangedDateConnection,
+            RangedDateConnection.start,
+          );
         } else {
-          expect(item.metadata.state, DateRangeState.unselected);
+          expect(item.metadata.rangedDateConnection, null);
         }
       }
     });
 
     testWidgets('shows end date if selectedEndDate is specified',
         (tester) async {
-      await tester.pumpWidget(widget);
+      await tester.pumpWidget(
+        _buildWidget(
+          currentMonth: currentMonth,
+          startDate: startDate,
+          endDate: endDate,
+          selectedEndDate: DateTime.now(),
+        ),
+      );
 
       final items = tester.widgetList<WidgetWithMetadata<DateState>>(
           find.byType(WidgetWithMetadata));
 
       for (final item in items) {
         if (item.key == ValueKey(endDate)) {
-          expect(item.metadata.state, DateRangeState.selected);
+          expect(
+            item.metadata.rangedDateConnection,
+            RangedDateConnection.start,
+          );
         } else {
-          expect(item.metadata.state, DateRangeState.unselected);
+          expect(item.metadata.rangedDateConnection, null);
         }
       }
     });
@@ -85,25 +106,29 @@ void main() {
 
       for (final item in items) {
         if (item.key == ValueKey(startDate) || item.key == ValueKey(endDate)) {
+          expect(item.metadata.rangedDateConnection, null);
+        } else if (item.key == ValueKey(selectedStartDate)) {
           expect(
-            item.metadata.state,
-            DateRangeState.unselected,
+            item.metadata.rangedDateConnection,
+            RangedDateConnection.startConnected,
           );
-        } else if (item.key == ValueKey(selectedStartDate) ||
-            item.key == ValueKey(selectedEndDate)) {
+        } else if (item.key == ValueKey(selectedEndDate)) {
           expect(
-            item.metadata.state,
-            DateRangeState.selectedConnected,
+            item.metadata.rangedDateConnection,
+            RangedDateConnection.endConnected,
           );
         } else {
-          expect(item.metadata.state, DateRangeState.inBetween);
+          expect(
+            item.metadata.inBetweenConnection,
+            isNotNull,
+          );
         }
       }
     });
 
     testWidgets(
-        'shows date range if both selectedStartDate and selectedEndDate are '
-        'specified and selectedStartDate and selectedEndDate are swapped',
+        'still shows date range if both selectedStartDate and selectedEndDate '
+        'are specified but selectedStartDate and selectedEndDate are swapped',
         (tester) async {
       final selectedStartDate = startDate.copyWith(day: startDate.day + 1);
       final selectedEndDate = endDate.copyWith(day: endDate.day - 1);
@@ -112,8 +137,8 @@ void main() {
         currentMonth: currentMonth,
         startDate: startDate,
         endDate: endDate,
-        selectedStartDate: selectedStartDate,
-        selectedEndDate: selectedEndDate,
+        selectedStartDate: selectedEndDate,
+        selectedEndDate: selectedStartDate,
       );
 
       await tester.pumpWidget(widget);
@@ -123,31 +148,34 @@ void main() {
 
       for (final item in items) {
         if (item.key == ValueKey(startDate) || item.key == ValueKey(endDate)) {
+          expect(item.metadata.rangedDateConnection, null);
+        } else if (item.key == ValueKey(selectedStartDate)) {
           expect(
-            item.metadata.state,
-            DateRangeState.unselected,
+            item.metadata.rangedDateConnection,
+            RangedDateConnection.startConnected,
           );
-        } else if (item.key == ValueKey(selectedStartDate) ||
-            item.key == ValueKey(selectedEndDate)) {
+        } else if (item.key == ValueKey(selectedEndDate)) {
           expect(
-            item.metadata.state,
-            DateRangeState.selectedConnected,
+            item.metadata.rangedDateConnection,
+            RangedDateConnection.endConnected,
           );
         } else {
-          expect(item.metadata.state, DateRangeState.inBetween);
+          expect(
+            item.metadata.inBetweenConnection,
+            isNotNull,
+          );
         }
       }
     });
   });
 }
 
-enum DateRangeState { unselected, selected, selectedConnected, inBetween }
-
 class DateState {
-  DateState(this.date, this.state);
+  DateState(this.date, this.rangedDateConnection, this.inBetweenConnection);
 
   final DateTime date;
-  final DateRangeState state;
+  final RangedDateConnection? rangedDateConnection;
+  final InBetweenConnection? inBetweenConnection;
 }
 
 Widget _buildWidget({
@@ -164,25 +192,22 @@ Widget _buildWidget({
       endDate: endDate,
       selectedStartDate: selectedStartDate,
       selectedEndDate: selectedEndDate,
-      itemBuilder: (context, date) => WidgetWithMetadata(
-        key: ValueKey(date),
-        metadata: DateState(date, DateRangeState.unselected),
-        child: Text('${date.day}'),
-      ),
-      selectedItemBuilder: (context, date, isConnected) => WidgetWithMetadata(
-        key: ValueKey(date),
-        metadata: DateState(
+      itemBuilder: (
+        context,
+        date,
+        selectedDatesConnection,
+        inBetweenConnection,
+      ) {
+        return WidgetWithMetadata(
+          key: ValueKey(date),
+          metadata: DateState(
             date,
-            isConnected
-                ? DateRangeState.selectedConnected
-                : DateRangeState.selected),
-        child: Text('${date.day}'),
-      ),
-      inBetweenItemBuilder: (context, date) => WidgetWithMetadata(
-        key: ValueKey(date),
-        metadata: DateState(date, DateRangeState.inBetween),
-        child: Text('${date.day}'),
-      ),
+            selectedDatesConnection,
+            inBetweenConnection,
+          ),
+          child: Text('${date.day}'),
+        );
+      },
     ),
   );
 }

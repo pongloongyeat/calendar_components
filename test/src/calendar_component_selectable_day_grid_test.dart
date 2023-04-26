@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:calendar_components/calendar_components.dart';
-import 'package:calendar_components/src/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -20,18 +19,13 @@ void main() {
 
       final widget = TesterHelperWidget(
         child: CalendarComponentSingleSelectableDayGrid.noOverflow(
+          selectedDate: null,
           currentMonth: currentMonth,
           startDate: startDate,
           endDate: endDate,
-          itemBuilder: (context, date) {
+          itemBuilder: (context, date, isSelected) {
             return WidgetWithMetadata(
-              metadata: false,
-              child: Text('${date.day}'),
-            );
-          },
-          selectedItemBuilder: (context, date) {
-            return WidgetWithMetadata(
-              metadata: true,
+              metadata: isSelected,
               child: Text('${date.day}'),
             );
           },
@@ -62,17 +56,10 @@ void main() {
           currentMonth: currentMonth,
           startDate: startDate,
           endDate: endDate,
-          itemBuilder: (context, date) {
+          itemBuilder: (context, date, isSelected) {
             return WidgetWithMetadata(
               key: ValueKey(date),
-              metadata: false,
-              child: Text('${date.day}'),
-            );
-          },
-          selectedItemBuilder: (context, date) {
-            return WidgetWithMetadata(
-              key: ValueKey(date),
-              metadata: true,
+              metadata: isSelected,
               child: Text('${date.day}'),
             );
           },
@@ -103,20 +90,14 @@ void main() {
 
       final widget = TesterHelperWidget(
         child: CalendarComponentMultipleSelectableDayGrid.noOverflow(
+          selectedDates: null,
           currentMonth: currentMonth,
           startDate: startDate,
           endDate: endDate,
-          itemBuilder: (context, date) {
+          itemBuilder: (context, date, isSelected) {
             return WidgetWithMetadata(
               key: ValueKey(date),
-              metadata: false,
-              child: Text('${date.day}'),
-            );
-          },
-          selectedItemBuilder: (context, date) {
-            return WidgetWithMetadata(
-              key: ValueKey(date),
-              metadata: true,
+              metadata: isSelected,
               child: Text('${date.day}'),
             );
           },
@@ -152,17 +133,10 @@ void main() {
           currentMonth: currentMonth,
           startDate: startDate,
           endDate: endDate,
-          itemBuilder: (context, date) {
+          itemBuilder: (context, date, isSelected) {
             return WidgetWithMetadata(
               key: ValueKey(date),
-              metadata: false,
-              child: Text('${date.day}'),
-            );
-          },
-          selectedItemBuilder: (context, date) {
-            return WidgetWithMetadata(
-              key: ValueKey(date),
-              metadata: true,
+              metadata: isSelected,
               child: Text('${date.day}'),
             );
           },

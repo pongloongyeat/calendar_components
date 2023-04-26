@@ -11,7 +11,7 @@ void main() {
     final widget = TesterHelperWidget(
       child: CalendarComponentDayGrid.overflow(
         currentMonth: currentMonth,
-        itemBuilder: (context, date) => Text('${date.day}'),
+        itemBuilder: (context, date, index) => Text('${date.day}'),
       ),
     );
 
@@ -69,7 +69,7 @@ void main() {
           currentMonth: currentMonth,
           startDate: startDate,
           endDate: endDate,
-          itemBuilder: (context, date) => Text('${date.day}'),
+          itemBuilder: (context, date, index) => Text('${date.day}'),
         ),
       );
 
@@ -90,7 +90,7 @@ void main() {
           currentMonth: currentMonth,
           startDate: startDate,
           endDate: endDate,
-          itemBuilder: (context, date) => Text('${date.day}'),
+          itemBuilder: (context, date, index) => Text('${date.day}'),
         ),
       );
 
