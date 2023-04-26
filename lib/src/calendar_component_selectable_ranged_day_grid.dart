@@ -3,6 +3,22 @@ import 'package:calendar_components/src/calendar_component_selectable_day_grid.d
 import 'package:calendar_components/src/extensions.dart';
 import 'package:flutter/material.dart';
 
+extension on DateTime {
+  /// Computes `a < this < b.` If strict is false, checking for `b < this < a`
+  /// also returns true.
+  bool isInBetween(
+    DateTime a,
+    DateTime b, {
+    bool strict = true,
+  }) {
+    if (strict) {
+      return isAfter(a) && isBefore(b);
+    } else {
+      return (isAfter(a) && isBefore(b)) || (isAfter(b) && isBefore(a));
+    }
+  }
+}
+
 /// A ranged selectable day grid of a calendar which allows for the selection
 /// of a range of dates. This widget is composed of [CalendarComponentDayGrid].
 /// This widget is a [StatelessWidget] and only forms as a basis for you to use

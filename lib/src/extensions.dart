@@ -9,14 +9,6 @@ extension DateTimeExtensions on DateTime {
     return copyWith(day: 1).toMidnight();
   }
 
-  DateTime copyWith({
-    int? year,
-    int? month,
-    int? day,
-  }) {
-    return DateTime(year ?? this.year, month ?? this.month, day ?? this.day);
-  }
-
   /// Returns the last day of the current month.
   DateTime lastDateOfCurrentMonth() {
     return DateTime(year, month + 1)
@@ -24,17 +16,26 @@ extension DateTimeExtensions on DateTime {
         .toMidnight();
   }
 
-  /// Computes `a < this < b.` If strict is false, checking for `b < this < a`
-  /// also returns true.
-  bool isInBetween(
-    DateTime a,
-    DateTime b, {
-    bool strict = true,
+  /// Returns the current [DateTime] with modified properties.
+  DateTime copyWith({
+    int? year,
+    int? month,
+    int? day,
+    int? hour,
+    int? minute,
+    int? second,
+    int? millisecond,
+    int? microsecond,
   }) {
-    if (strict) {
-      return isAfter(a) && isBefore(b);
-    } else {
-      return (isAfter(a) && isBefore(b)) || (isAfter(b) && isBefore(a));
-    }
+    return DateTime(
+      year ?? this.year,
+      month ?? this.month,
+      day ?? this.day,
+      hour ?? this.hour,
+      minute ?? this.minute,
+      second ?? this.second,
+      millisecond ?? this.millisecond,
+      microsecond ?? this.microsecond,
+    );
   }
 }
