@@ -71,7 +71,7 @@ final currentMonth = DateTime.now();
 CalendarComponentSingleSelectableDayGrid.overflow(
   selectedDate: ...,
   currentMonth: currentMonth,
-  itemBuilder: (context, date, isSelected) {
+  itemBuilder: (context, date, isSelected, index) {
     return GestureDetector(
       onTap: () => setState(() {
         // Do something
@@ -88,7 +88,7 @@ CalendarComponentMultipleSelectableDayGrid.noOverflow(
   currentMonth: currentMonth,
   startDate: currentMonth.copyWith(day: 1),
   endDate: currentMonth.lastDayOfCurrentMonth(),
-  itemBuilder: (context, date, isSelected) {
+  itemBuilder: (context, date, isSelected, index) {
     return GestureDetector(
       onTap: () => setState(() {
         // Do something
@@ -102,31 +102,30 @@ CalendarComponentMultipleSelectableDayGrid.noOverflow(
 ### `CalendarComponentRangedSelectableDayGrid`
 A ranged selectable day grid of a calendar which allows for the selection of a range of dates. This is a `StatelessWidget`. You should handle storing your selected date range by yourself. An example is provided in the `example/` folder.
 
-The item builder for this widget contains two _connection_ enum parameters passed in its builder:
-- `RangedDateConnection` and
-- `InBetweenConnection`
+The item builder for this widget contains a `SelectedDateRangeState` passed in its builder.
 
-A `RangedDateConnection` describes which end of the connected date in the grid an item is connected to. For example,
+A `SelectedDateRangeState` describes what state a selected date is in inside the `CalendarComponentRangedSelectableDayGrid` calendar grid
 
-<img src="screenshots/ranged_date_connection_1.png" height=720/>
+If this value is null, it means the item being built is not a selected item nor is it within a selected date range.
 
-If only one date is chosen, this corresponds to an unconnected end.
-Referring to the example above,
+If only one date is chosen, this corresponds to an unconnected start date. Note that there cannot be an unconnected end date since it is unbounded at this point.
 
-<img src="screenshots/ranged_date_connection_2.png" height=720/>
+<img src="screenshots/selected_date_range_state_1.png" height=720/>
 
-An `InBetweenConnection` describes the state of an item in between two dates at either end of the grid. For example,
+For a valid/bounded date range, it is possible to determine whether an item in the selected date range is a start date, end date or in between. Notice that the enum is called `startConnected` and `endConnected`. This is because the date range is now valid and you may want to render a joined selected item widget.
 
-<img src="screenshots/in_between_connection.png" height=720/>
+<img src="screenshots/selected_date_range_state_2.png" height=720/>
 
-This is typically useful for showing fade effects/gradients at the extreme ends of the calendar grid.
+Additionally, there is also a `startDateIsEndDate` enum value to describe that the start and end dates are the same. This is exposed in case you want to render this as a valid date range.
+
+Also included is an index that is passed in the item builder. This is typically useful for showing fade effects/gradients at the extreme ends of the calendar grid.
 
 ```dart
 CalendarComponentRangedSelectableDayGrid.overflow(
   selectedStartDate: ...,
   selectedEndDate: ...,
   currentMonth: DateTime.now(),
-  itemBuilder: (context, date, selectedDateConnection, inBetweenConnection) {
+  itemBuilder: (context, date, selectedState, index) {
     return GestureDetector(
       onTap: () => setState(() {
         // Do something
