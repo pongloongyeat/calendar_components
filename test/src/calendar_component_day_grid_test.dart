@@ -2,6 +2,7 @@ import 'package:calendar_components/calendar_components.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../utils/extensions.dart';
 import '../utils/helper_widgets.dart';
 
 void main() {
@@ -11,7 +12,10 @@ void main() {
     final widget = TesterHelperWidget(
       child: CalendarComponentDayGrid.overflow(
         currentMonth: currentMonth,
-        itemBuilder: (context, date, index) => Text('${date.day}'),
+        itemBuilder: (context, date, index) => WidgetWithMetadata(
+          metadata: date,
+          child: Text('${date.day}'),
+        ),
       ),
     );
 
@@ -96,6 +100,23 @@ void main() {
 
       await tester.pumpWidget(widget);
       expect(find.byType(Text), findsNWidgets(42));
+    });
+
+    testWidgets('builds all dates as midnight dates', (tester) async {
+      await tester.pumpWidget(widget);
+
+      final items = tester.widgetList<WidgetWithMetadata<DateTime>>(
+          find.byType(WidgetWithMetadata));
+      expect(
+        items.all((e) {
+          return e.metadata.hour == 0 &&
+              e.metadata.minute == 0 &&
+              e.metadata.second == 0 &&
+              e.metadata.millisecond == 0 &&
+              e.metadata.microsecond == 0;
+        }),
+        true,
+      );
     });
   });
 }
