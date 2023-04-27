@@ -27,8 +27,8 @@ void main() {
 
       expect(
         items.all((e) =>
-            e.metadata.rangedDateConnection == null &&
-            e.metadata.inBetweenConnection == null),
+            e.metadata.selectedState == null &&
+            e.metadata.selectedState == null),
         true,
       );
     });
@@ -50,11 +50,11 @@ void main() {
       for (final item in items) {
         if (item.key == ValueKey(startDate)) {
           expect(
-            item.metadata.rangedDateConnection,
-            RangedDateConnection.start,
+            item.metadata.selectedState,
+            SelectedDateRangeState.startDate,
           );
         } else {
-          expect(item.metadata.rangedDateConnection, null);
+          expect(item.metadata.selectedState, null);
         }
       }
     });
@@ -76,11 +76,11 @@ void main() {
       for (final item in items) {
         if (item.key == ValueKey(endDate)) {
           expect(
-            item.metadata.rangedDateConnection,
-            RangedDateConnection.start,
+            item.metadata.selectedState,
+            SelectedDateRangeState.startDate,
           );
         } else {
-          expect(item.metadata.rangedDateConnection, null);
+          expect(item.metadata.selectedState, null);
         }
       }
     });
@@ -106,21 +106,21 @@ void main() {
 
       for (final item in items) {
         if (item.key == ValueKey(startDate) || item.key == ValueKey(endDate)) {
-          expect(item.metadata.rangedDateConnection, null);
+          expect(item.metadata.selectedState, null);
         } else if (item.key == ValueKey(selectedStartDate)) {
           expect(
-            item.metadata.rangedDateConnection,
-            RangedDateConnection.startConnected,
+            item.metadata.selectedState,
+            SelectedDateRangeState.startDateConnected,
           );
         } else if (item.key == ValueKey(selectedEndDate)) {
           expect(
-            item.metadata.rangedDateConnection,
-            RangedDateConnection.endConnected,
+            item.metadata.selectedState,
+            SelectedDateRangeState.endDateConnected,
           );
         } else {
           expect(
-            item.metadata.inBetweenConnection,
-            isNotNull,
+            item.metadata.selectedState,
+            SelectedDateRangeState.inBetween,
           );
         }
       }
@@ -148,21 +148,21 @@ void main() {
 
       for (final item in items) {
         if (item.key == ValueKey(startDate) || item.key == ValueKey(endDate)) {
-          expect(item.metadata.rangedDateConnection, null);
+          expect(item.metadata.selectedState, null);
         } else if (item.key == ValueKey(selectedStartDate)) {
           expect(
-            item.metadata.rangedDateConnection,
-            RangedDateConnection.startConnected,
+            item.metadata.selectedState,
+            SelectedDateRangeState.startDateConnected,
           );
         } else if (item.key == ValueKey(selectedEndDate)) {
           expect(
-            item.metadata.rangedDateConnection,
-            RangedDateConnection.endConnected,
+            item.metadata.selectedState,
+            SelectedDateRangeState.endDateConnected,
           );
         } else {
           expect(
-            item.metadata.inBetweenConnection,
-            isNotNull,
+            item.metadata.selectedState,
+            SelectedDateRangeState.inBetween,
           );
         }
       }
@@ -171,11 +171,10 @@ void main() {
 }
 
 class DateState {
-  DateState(this.date, this.rangedDateConnection, this.inBetweenConnection);
+  DateState(this.date, this.selectedState);
 
   final DateTime date;
-  final RangedDateConnection? rangedDateConnection;
-  final InBetweenConnection? inBetweenConnection;
+  final SelectedDateRangeState? selectedState;
 }
 
 Widget _buildWidget({
@@ -196,14 +195,13 @@ Widget _buildWidget({
         context,
         date,
         selectedDatesConnection,
-        inBetweenConnection,
+        index,
       ) {
         return WidgetWithMetadata(
           key: ValueKey(date),
           metadata: DateState(
             date,
             selectedDatesConnection,
-            inBetweenConnection,
           ),
           child: Text('${date.day}'),
         );

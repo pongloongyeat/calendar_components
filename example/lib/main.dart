@@ -127,33 +127,41 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _onDateTapped(DateTime date) {
     setState(() {
-      if (_selectedStartDate == null) {
+      final selectedStartDate = _selectedStartDate;
+      final selectedEndDate = _selectedEndDate;
+
+      if (selectedStartDate == null) {
         _selectedStartDate = date;
         return;
       }
 
-      if (_selectedEndDate == null) {
-        _selectedEndDate = date;
-        return;
-      }
-
-      if (_selectedStartDate != null && _selectedEndDate != null) {
-        if (date.isAtSameMomentAs(_selectedStartDate!)) {
-          _selectedStartDate = date;
+      if (selectedEndDate == null) {
+        // Allow deselection if same date
+        if (date.isAtSameMomentAs(selectedStartDate)) {
+          _selectedStartDate = null;
           _selectedEndDate = null;
           return;
-        }
-
-        if (date.isAtSameMomentAs(_selectedEndDate!)) {
+        } else {
           _selectedEndDate = date;
-          _selectedStartDate = null;
           return;
         }
+      }
 
-        _selectedEndDate = null;
+      if (date.isAtSameMomentAs(selectedStartDate)) {
         _selectedStartDate = date;
+        _selectedEndDate = null;
         return;
       }
+
+      if (date.isAtSameMomentAs(selectedEndDate)) {
+        _selectedStartDate = date;
+        _selectedEndDate = null;
+        return;
+      }
+
+      _selectedEndDate = null;
+      _selectedStartDate = date;
+      return;
     });
   }
 }
@@ -234,35 +242,11 @@ class PartialCalendarDayGrid extends StatelessWidget {
   Widget _itemBuilder(
     BuildContext context,
     DateTime date,
-    RangedDateConnection? selectedDateConnection,
-    InBetweenConnection? inBetweenConnection,
+    SelectedDateRangeState? selectedState,
+    int index,
   ) {
     final isDateAvailable = this.isDateAvailable?.call(date) ?? true;
     final onDateTapped = isDateAvailable ? this.onDateTapped : null;
-
-    if (selectedDateConnection != null) {
-      return PartialCalendarDayGridItem.selected(
-        date,
-        currentMonth: currentMonth,
-        startDate: startDate,
-        endDate: endDate,
-        itemExtent: itemExtent,
-        connection: selectedDateConnection,
-        onDateTapped: onDateTapped,
-      );
-    }
-
-    if (inBetweenConnection != null) {
-      return PartialCalendarDayGridItem.inBetween(
-        date,
-        currentMonth: currentMonth,
-        startDate: startDate,
-        endDate: endDate,
-        itemExtent: itemExtent,
-        connection: inBetweenConnection,
-        onDateTapped: onDateTapped,
-      );
-    }
 
     return PartialCalendarDayGridItem(
       date,
@@ -270,6 +254,8 @@ class PartialCalendarDayGrid extends StatelessWidget {
       startDate: startDate,
       endDate: endDate,
       itemExtent: itemExtent,
+      itemIndex: index,
+      selectedState: selectedState,
       onDateTapped: onDateTapped,
     );
   }
@@ -283,49 +269,18 @@ class PartialCalendarDayGridItem extends StatelessWidget {
     required this.startDate,
     required this.endDate,
     required this.itemExtent,
+    required this.itemIndex,
+    required this.selectedState,
     this.onDateTapped,
-  })  : isSelected = false,
-        isInBetween = false,
-        selectedDateConnection = null,
-        inBetweenConnection = null;
-
-  PartialCalendarDayGridItem.selected(
-    this.date, {
-    super.key,
-    required this.currentMonth,
-    required this.startDate,
-    required this.endDate,
-    required this.itemExtent,
-    required RangedDateConnection connection,
-    this.onDateTapped,
-  })  : isSelected = true,
-        isInBetween = connection.isConnected,
-        selectedDateConnection = connection,
-        inBetweenConnection = null;
-
-  const PartialCalendarDayGridItem.inBetween(
-    this.date, {
-    super.key,
-    required this.currentMonth,
-    required this.startDate,
-    required this.endDate,
-    required this.itemExtent,
-    required InBetweenConnection connection,
-    this.onDateTapped,
-  })  : isSelected = false,
-        isInBetween = true,
-        selectedDateConnection = null,
-        inBetweenConnection = connection;
+  });
 
   final DateTime date;
   final DateTime currentMonth;
   final DateTime startDate;
   final DateTime endDate;
   final double itemExtent;
-  final bool isSelected;
-  final bool isInBetween;
-  final RangedDateConnection? selectedDateConnection;
-  final InBetweenConnection? inBetweenConnection;
+  final int itemIndex;
+  final SelectedDateRangeState? selectedState;
   final ValueChanged<DateTime>? onDateTapped;
 
   @override
@@ -347,43 +302,51 @@ class PartialCalendarDayGridItem extends StatelessWidget {
     final inBetweenDecoration = BoxDecoration(
       color: inBetweenColor,
       gradient: () {
-        switch (inBetweenConnection) {
-          case InBetweenConnection.start:
-            return LinearGradient(
-              colors: [
-                inBetweenColor,
-                Theme.of(context).scaffoldBackgroundColor,
-              ],
-              stops: const [0.65, 1],
-              begin: Alignment.centerRight,
-              end: Alignment.centerLeft,
-            );
-          case InBetweenConnection.end:
-            return LinearGradient(
-              colors: [
-                inBetweenColor,
-                Theme.of(context).scaffoldBackgroundColor,
-              ],
-              stops: const [0.65, 1],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            );
-          default:
-            return null;
+        final isLeftMostDate = itemIndex % DateTime.daysPerWeek == 0;
+        final isRightMostDate = (itemIndex + 1) % DateTime.daysPerWeek == 0;
+        final isDateFirstOfTheMonth =
+            date.isAtSameMomentAs(currentMonth.copyWith(day: 1));
+        final isDateLastOfTheMonth =
+            date.isAtSameMomentAs(currentMonth.lastDateOfCurrentMonth());
+
+        if (!isLeftMostDate &&
+            !isRightMostDate &&
+            !isDateFirstOfTheMonth &&
+            !isDateLastOfTheMonth) {
+          return null;
         }
+
+        return LinearGradient(
+          colors: [
+            inBetweenColor,
+            Theme.of(context).scaffoldBackgroundColor,
+          ],
+          stops: const [0.65, 1],
+          begin: isLeftMostDate || isDateFirstOfTheMonth
+              ? Alignment.centerRight
+              : Alignment.centerLeft,
+          end: isRightMostDate || isDateLastOfTheMonth
+              ? Alignment.centerRight
+              : Alignment.centerLeft,
+        );
       }(),
     );
 
     const margin = EdgeInsets.all(4);
     final inBetweenMargin = margin.copyWith(left: 0, right: 0);
     final connectedEndMargin = margin.copyWith(
-      left: selectedDateConnection == RangedDateConnection.startConnected
+      left: selectedState == SelectedDateRangeState.startDateConnected
           ? itemExtent / 2
           : 0,
-      right: selectedDateConnection == RangedDateConnection.endConnected
+      right: selectedState == SelectedDateRangeState.endDateConnected
           ? itemExtent / 2
           : 0,
     );
+
+    final isValidDateRange = selectedState?.isValidDateRange ?? false;
+    final isSelected = selectedState?.isSelected ?? false;
+    final startDateIsEndDate =
+        selectedState == SelectedDateRangeState.startDateIsEndDate;
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -393,10 +356,10 @@ class PartialCalendarDayGridItem extends StatelessWidget {
         height: itemExtent,
         child: Stack(
           children: [
-            if (isInBetween)
+            if (isValidDateRange)
               Container(
                 decoration: inBetweenDecoration,
-                margin: selectedDateConnection != null
+                margin: selectedState != null
                     ? connectedEndMargin
                     : inBetweenMargin,
               ),

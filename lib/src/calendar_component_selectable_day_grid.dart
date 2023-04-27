@@ -8,6 +8,7 @@ typedef CalendarGridSelectableItemBuilder = Widget Function(
   BuildContext context,
   DateTime date,
   bool isSelected,
+  int index,
 );
 
 /// A selectable day grid of a calendar which allows for the selection of only
@@ -88,10 +89,10 @@ class CalendarComponentSingleSelectableDayGrid extends StatelessWidget {
     final selectedDate = this.selectedDate;
 
     if (selectedDate?.isAtSameMomentAs(date) ?? false) {
-      return itemBuilder(context, date, true);
+      return itemBuilder(context, date, true, index);
     }
 
-    return itemBuilder(context, date, false);
+    return itemBuilder(context, date, false, index);
   }
 }
 
@@ -174,9 +175,9 @@ class CalendarComponentMultipleSelectableDayGrid extends StatelessWidget {
 
   Widget _itemBuilder(BuildContext context, DateTime date, int index) {
     if (selectedDates.any((e) => e.isAtSameMomentAs(date))) {
-      return itemBuilder(context, date, true);
+      return itemBuilder(context, date, true, index);
     }
 
-    return itemBuilder(context, date, false);
+    return itemBuilder(context, date, false, index);
   }
 }

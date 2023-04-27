@@ -23,7 +23,7 @@ void main() {
           currentMonth: currentMonth,
           startDate: startDate,
           endDate: endDate,
-          itemBuilder: (context, date, isSelected) {
+          itemBuilder: (context, date, isSelected, index) {
             return WidgetWithMetadata(
               metadata: isSelected,
               child: Text('${date.day}'),
@@ -56,7 +56,7 @@ void main() {
           currentMonth: currentMonth,
           startDate: startDate,
           endDate: endDate,
-          itemBuilder: (context, date, isSelected) {
+          itemBuilder: (context, date, isSelected, index) {
             return WidgetWithMetadata(
               key: ValueKey(date),
               metadata: isSelected,
@@ -94,7 +94,7 @@ void main() {
           currentMonth: currentMonth,
           startDate: startDate,
           endDate: endDate,
-          itemBuilder: (context, date, isSelected) {
+          itemBuilder: (context, date, isSelected, index) {
             return WidgetWithMetadata(
               key: ValueKey(date),
               metadata: isSelected,
@@ -133,7 +133,7 @@ void main() {
           currentMonth: currentMonth,
           startDate: startDate,
           endDate: endDate,
-          itemBuilder: (context, date, isSelected) {
+          itemBuilder: (context, date, isSelected, index) {
             return WidgetWithMetadata(
               key: ValueKey(date),
               metadata: isSelected,

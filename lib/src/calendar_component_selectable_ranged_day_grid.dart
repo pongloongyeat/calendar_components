@@ -3,6 +3,14 @@ import 'package:calendar_components/src/calendar_component_selectable_day_grid.d
 import 'package:calendar_components/src/extensions.dart';
 import 'package:flutter/material.dart';
 
+/// The builder signature for a selectable ranged date calendar grid item.
+typedef CalendarRangeDateGridSeletableItemBuilder = Widget Function(
+  BuildContext context,
+  DateTime date,
+  SelectedDateRangeState? selectedState,
+  int index,
+);
+
 extension on DateTime {
   /// Computes `a < this < b.` If strict is false, checking for `b < this < a`
   /// also returns true.
@@ -19,85 +27,32 @@ extension on DateTime {
   }
 }
 
-/// An enum describing which end of the connected date in the
-/// [CalendarComponentRangedSelectableDayGrid] that an item is connected to. For
-/// example,
-///
-/// {@template RangedDateConnection.example}
-/// ```
-/// M  T  W  T  F  S  S
-/// ====================
-/// 1  2  3  4  S  x  x
-///             ^
-///       startConnected
-/// x  x  S  11 12 13 14
-///       ^
-/// endConnected
-/// ====================
-/// ```
-///
-/// If only one date is chosen, this corresponds to an unconnected end.
-/// Referring to the example above,
-///
-/// ```
-/// M  T  W  T  F  S  S
-/// ====================
-/// 1  2  3  4  S  6  7
-///             ^
-///           start
-/// 8  9  10 11 12 13 14
-/// ====================
-/// ```
-///
-/// where `S` indicates a selected end and `x` its in between items.
-/// {@endtemplate}
-enum RangedDateConnection {
-  start,
-  startConnected,
-  endConnected;
+/// An enum describing what state a selected date is in inside a
+/// [CalendarComponentRangedSelectableDayGrid].
+enum SelectedDateRangeState {
+  /// The current position of the selected date is at the start/end date.
+  startDate,
 
-  /// Describes if the connection is connected.
-  bool get isConnected =>
-      this == RangedDateConnection.startConnected ||
-      this == RangedDateConnection.endConnected;
-}
+  /// Both start date and end dates are specified and this item is at the
+  /// position of the starting date.
+  startDateConnected,
 
-/// An enum describing the state of an item in between two dates at either end
-/// of the grid. For example,
-///
-/// {@template InBetweenConnection.example}
-/// ```
-/// M  T  W  T  F  S  S
-/// ====================
-/// 1  2  3  4  S  x  x
-///                ^  ^
-///         notBroken |
-///                   |
-///                  end
-/// x  x  S  11 12 13 14
-/// ^
-/// start
-/// ====================
-/// ```
-///
-/// where `S` indicates a selected end and `x` its in between items.
-/// {@endtemplate}
-enum InBetweenConnection {
-  start,
-  notBroken,
-  end;
+  /// Both start date and end dates are specified and this item is at the
+  /// position of the ending date.
+  endDateConnected,
 
-  static InBetweenConnection fromIndex(int index) {
-    if (index % DateTime.daysPerWeek == 0) {
-      return InBetweenConnection.start;
-    }
+  /// Both start date and end dates are the same.
+  startDateIsEndDate,
 
-    if (index % DateTime.daysPerWeek == DateTime.daysPerWeek - 1) {
-      return InBetweenConnection.end;
-    }
+  /// Both start date and end dates are specified and this item is in between
+  /// both the starting and ending dates.
+  inBetween;
 
-    return InBetweenConnection.notBroken;
-  }
+  /// Returns true if both start and end dates are specified.
+  bool get isValidDateRange => this != startDate;
+
+  /// Returns true at both start and end dates.
+  bool get isSelected => this != inBetween;
 }
 
 /// A ranged selectable day grid of a calendar which allows for the selection
@@ -160,22 +115,7 @@ class CalendarComponentRangedSelectableDayGrid extends StatelessWidget {
   /// {@macro CalendarComponentDayGrid.itemBuilder}
   ///
   /// {@macro CalendarComponentDayGrid.itemBuilderDisclaimer}
-  ///
-  /// If `selectedDateConnection` is not null, this means that there is one or
-  /// more selected dates. For example,
-  ///
-  /// {@macro RangedDateConnection.example}
-  ///
-  /// If `inBetweenConnection` is not null, this indicates that the date being built is
-  /// on one end of the calendar's grid. For example,
-  ///
-  /// {@macro InBetweenConnection.example}
-  final Widget Function(
-    BuildContext context,
-    DateTime date,
-    RangedDateConnection? selectedDateConnection,
-    InBetweenConnection? inBetweenConnection,
-  ) itemBuilder;
+  final CalendarRangeDateGridSeletableItemBuilder itemBuilder;
 
   @override
   Widget build(BuildContext context) {
@@ -207,9 +147,13 @@ class CalendarComponentRangedSelectableDayGrid extends StatelessWidget {
       }
 
       if (selectedStartDate.isAtSameMomentAs(selectedEndDate) &&
-          (date.isAtSameMomentAs(selectedStartDate) ||
-              date.isAtSameMomentAs(selectedEndDate))) {
-        return itemBuilder(context, date, null, null);
+          date.isAtSameMomentAs(selectedStartDate)) {
+        return itemBuilder(
+          context,
+          date,
+          SelectedDateRangeState.startDateIsEndDate,
+          index,
+        );
       }
     }
 
@@ -218,10 +162,10 @@ class CalendarComponentRangedSelectableDayGrid extends StatelessWidget {
           ? itemBuilder(
               context,
               date,
-              RangedDateConnection.startConnected,
-              null,
+              SelectedDateRangeState.startDateConnected,
+              index,
             )
-          : itemBuilder(context, date, RangedDateConnection.start, null);
+          : itemBuilder(context, date, SelectedDateRangeState.startDate, index);
     }
 
     if (selectedEndDate != null && date.isAtSameMomentAs(selectedEndDate)) {
@@ -229,10 +173,10 @@ class CalendarComponentRangedSelectableDayGrid extends StatelessWidget {
           ? itemBuilder(
               context,
               date,
-              RangedDateConnection.endConnected,
-              null,
+              SelectedDateRangeState.endDateConnected,
+              index,
             )
-          : itemBuilder(context, date, RangedDateConnection.start, null);
+          : itemBuilder(context, date, SelectedDateRangeState.startDate, index);
     }
 
     if (selectedStartDate != null &&
@@ -241,11 +185,11 @@ class CalendarComponentRangedSelectableDayGrid extends StatelessWidget {
       return itemBuilder(
         context,
         date,
-        null,
-        InBetweenConnection.fromIndex(index),
+        SelectedDateRangeState.inBetween,
+        index,
       );
     }
 
-    return itemBuilder(context, date, null, null);
+    return itemBuilder(context, date, null, index);
   }
 }
