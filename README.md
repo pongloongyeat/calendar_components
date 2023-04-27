@@ -1,10 +1,14 @@
 A collection of basic composable components for creating calendars.
 
+[![build](https://github.com/pongloongyeat/calendar_components/actions/workflows/flutter.yaml/badge.svg)](https://github.com/pongloongyeat/calendar_components/actions/workflows/flutter.yaml)
+[![Pub package](https://img.shields.io/pub/v/calendar_components.svg)](https://pub.dev/packages/calendar_components)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+
 ## Getting started
 Add the following line to your `pubspec.yaml`
 
 ```yaml
-calendar_components: ^0.0.1
+calendar_components: ^0.1.0
 ```
 
 ## Available components
