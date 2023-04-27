@@ -23,12 +23,14 @@ void main() {
       );
 
       final items = tester.widgetList<WidgetWithMetadata<DateState>>(
-          find.byType(WidgetWithMetadata));
+        find.byType(WidgetWithMetadata),
+      );
 
       expect(
-        items.all((e) =>
-            e.metadata.selectedState == null &&
-            e.metadata.selectedState == null),
+        items.all((e) {
+          return e.metadata.selectedState == null &&
+              e.metadata.selectedState == null;
+        }),
         true,
       );
     });
@@ -45,7 +47,8 @@ void main() {
       );
 
       final items = tester.widgetList<WidgetWithMetadata<DateState>>(
-          find.byType(WidgetWithMetadata));
+        find.byType(WidgetWithMetadata),
+      );
 
       for (final item in items) {
         if (item.key == ValueKey(startDate)) {
@@ -71,7 +74,8 @@ void main() {
       );
 
       final items = tester.widgetList<WidgetWithMetadata<DateState>>(
-          find.byType(WidgetWithMetadata));
+        find.byType(WidgetWithMetadata),
+      );
 
       for (final item in items) {
         if (item.key == ValueKey(endDate)) {
@@ -102,7 +106,8 @@ void main() {
       await tester.pumpWidget(widget);
 
       final items = tester.widgetList<WidgetWithMetadata<DateState>>(
-          find.byType(WidgetWithMetadata));
+        find.byType(WidgetWithMetadata),
+      );
 
       for (final item in items) {
         if (item.key == ValueKey(startDate) || item.key == ValueKey(endDate)) {
@@ -144,7 +149,8 @@ void main() {
       await tester.pumpWidget(widget);
 
       final items = tester.widgetList<WidgetWithMetadata<DateState>>(
-          find.byType(WidgetWithMetadata));
+        find.byType(WidgetWithMetadata),
+      );
 
       for (final item in items) {
         if (item.key == ValueKey(startDate) || item.key == ValueKey(endDate)) {

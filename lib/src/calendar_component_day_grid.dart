@@ -236,8 +236,8 @@ class CalendarComponentDayGrid extends StatelessWidget {
       );
     }
 
-    var columnChildren = <Row>[];
-    var rowChildren = <Widget>[];
+    final columnChildren = <Row>[];
+    final rowChildren = <Widget>[];
 
     for (var i = 0; i < dates.length; i++) {
       final date = dates[i];

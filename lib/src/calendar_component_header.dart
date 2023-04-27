@@ -42,7 +42,7 @@ class CalendarComponentHeader extends StatelessWidget {
   }
 
   /// Returns a list of [GregorianCalendarDay] whose first element corresponds
-  /// to [localizations.firstDayOfWeekIndex].
+  /// to [MaterialLocalizations.firstDayOfWeekIndex].
   ///
   /// For example, Sunday is the first day in en_US and so this method returns
   /// [sunday, monday, tuesday, wednesday, thursday, friday, saturday]

@@ -36,7 +36,9 @@ void main() {
 
       expect(
         tester
-            .widgetList<WidgetWithMetadata>(find.byType(WidgetWithMetadata))
+            .widgetList<WidgetWithMetadata<bool>>(
+              find.byType(WidgetWithMetadata),
+            )
             .all((e) => !e.metadata),
         true,
       );
@@ -48,7 +50,8 @@ void main() {
       final startDate = currentMonth.copyWith(day: 1);
       final endDate = currentMonth.lastDateOfCurrentMonth();
       final selectedDate = currentMonth.copyWith(
-          day: rand.nextIntBetween(min: 1, max: endDate.day));
+        day: rand.nextIntBetween(min: 1, max: endDate.day),
+      );
 
       final widget = TesterHelperWidget(
         child: CalendarComponentSingleSelectableDayGrid.noOverflow(
@@ -68,8 +71,9 @@ void main() {
 
       await tester.pumpWidget(widget);
 
-      final items = tester
-          .widgetList<WidgetWithMetadata>(find.byType(WidgetWithMetadata));
+      final items = tester.widgetList<WidgetWithMetadata<bool>>(
+        find.byType(WidgetWithMetadata),
+      );
 
       for (final item in items) {
         if (item.key == ValueKey(selectedDate)) {
@@ -108,7 +112,9 @@ void main() {
 
       expect(
         tester
-            .widgetList<WidgetWithMetadata>(find.byType(WidgetWithMetadata))
+            .widgetList<WidgetWithMetadata<bool>>(
+              find.byType(WidgetWithMetadata),
+            )
             .all((e) => !e.metadata),
         true,
       );
@@ -145,8 +151,9 @@ void main() {
 
       await tester.pumpWidget(widget);
 
-      final items = tester
-          .widgetList<WidgetWithMetadata>(find.byType(WidgetWithMetadata));
+      final items = tester.widgetList<WidgetWithMetadata<bool>>(
+        find.byType(WidgetWithMetadata),
+      );
 
       for (final item in items) {
         if (selectedDates.any((element) => item.key == ValueKey(element))) {

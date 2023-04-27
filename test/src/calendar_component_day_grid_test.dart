@@ -106,7 +106,8 @@ void main() {
       await tester.pumpWidget(widget);
 
       final items = tester.widgetList<WidgetWithMetadata<DateTime>>(
-          find.byType(WidgetWithMetadata));
+        find.byType(WidgetWithMetadata),
+      );
       expect(
         items.all((e) {
           return e.metadata.hour == 0 &&

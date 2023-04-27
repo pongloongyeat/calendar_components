@@ -22,7 +22,7 @@ extension IterableExtensions<E> on Iterable<E> {
   /// result = numbers.all((element) => element <= 10); // true;
   /// ```
   bool all(bool Function(E element) test) {
-    for (E element in this) {
+    for (final element in this) {
       if (!test(element)) return false;
     }
     return true;

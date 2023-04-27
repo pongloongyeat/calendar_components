@@ -345,8 +345,6 @@ class PartialCalendarDayGridItem extends StatelessWidget {
 
     final isValidDateRange = selectedState?.isValidDateRange ?? false;
     final isSelected = selectedState?.isSelected ?? false;
-    final startDateIsEndDate =
-        selectedState == SelectedDateRangeState.startDateIsEndDate;
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
