@@ -1,6 +1,6 @@
 name: calendar_components
 description: A collection of basic composable components for creating calendars.
-version: 0.0.1
+version: 0.1.0
 homepage: https://github.com/pongloongyeat/calendar_components
 
 environment:
