@@ -29,23 +29,25 @@ CalendarComponentHeader(
 
 ### `CalendarComponentDayGrid`
 
-The basic calendar grid. `CalendarComponentDayGrid` comes with two constructors for dealing with overflowing dates where extra dates have to be shown to ensure that the calendar grid is fully filled with 6 rows of 7 days. An example of overflow:
+The basic calendar grid. If the start and end dates are not specified, the calendar grid is fully filled with 6 rows of 7 days with underflowed/overflowed dates. An example of underflow/overflow:
 
-<img src="screenshots/overflow.png" height=720/>
+<img src="https://github.com/pongloongyeat/calendar_components/assets/31680656/4a21304a-a121-4f64-b120-f0e827cfc65a" height=720/>
 
-If constructed with no overflow, this removes the overflowed weeks where possible.
+To deal with overflow, you can specify your own date range for either/both start and end dates. For example, if the end date is 30th April 2023, the grid would only build items up till the last day of the week containing 30th April 2023.
 
 Referring to the example above:
 
-<img src="screenshots/no_overflow.png" height=720/>
+<img src="https://github.com/pongloongyeat/calendar_components/assets/31680656/4f47553e-7a6c-415a-b4a0-7b2580795117" height=720/>
 
-Notice that the overflowed week at the bottom of April has been removed but the overflowed days remain at the top since removing the whole week would mean removing the 1st and 2nd days of the month, which is part of the current month and shouldn't be removed.
+Notice that the overflowed week at the bottom has been removed but the underflowed days remain at the top since removing the whole week would mean removing the 1st and 2nd days of the month, which is part of the current month and shouldn't be removed.
 
 ```dart
 final currentMonth = DateTime.now();
 
-CalendarComponentDayGrid.overflow(
+CalendarComponentDayGrid(
   currentMonth: currentMonth,
+  startDate: currentMonth.copyWith(day: 1),
+  endDate: currentMonth.lastDayOfCurrentMonth(),
   itemBuilder: (context, date, index) {
     return Text('${date.day}');
   },
@@ -63,16 +65,16 @@ CalendarComponentDayGrid.noOverflow(
 );
 ```
 
-### `CalendarComponentSingleSelectableDayGrid` and `CalendarComponentMultipleSelectableDayGrid`
+### `CalendarComponentSelectableDayGrid`
 
-A selectable day grid of a calendar which allows for the selection of one or more dates. This is a `StatelessWidget`. You should handle storing your selected date(s) by yourself.
+A selectable day grid of a calendar which allows for the selection of one or more date(s). This is a `StatelessWidget`. You should handle storing your selected date(s) by yourself.
 
 An `isSelected` boolean is provided in the item builder to render your widget for selected and unselected states.
 
 ```dart
 final currentMonth = DateTime.now();
 
-CalendarComponentSingleSelectableDayGrid.overflow(
+CalendarComponentSelectableDayGrid.single(
   selectedDate: ...,
   currentMonth: currentMonth,
   itemBuilder: (context, date, isSelected, index) {
@@ -87,7 +89,7 @@ CalendarComponentSingleSelectableDayGrid.overflow(
 
 // or
 
-CalendarComponentMultipleSelectableDayGrid.noOverflow(
+CalendarComponentSelectableDayGrid.multiple(
   selectedDates: [...],
   currentMonth: currentMonth,
   startDate: currentMonth.copyWith(day: 1),
@@ -103,8 +105,8 @@ CalendarComponentMultipleSelectableDayGrid.noOverflow(
 );
 ```
 
-### `CalendarComponentRangedSelectableDayGrid`
-A ranged selectable day grid of a calendar which allows for the selection of a range of dates. This is a `StatelessWidget`. You should handle storing your selected date range by yourself. An example is provided in the `example/` folder.
+### `CalendarComponentSelectableRangedDayGrid`
+A selectable ranged day grid of a calendar which allows for the selection of a range of dates. This is a `StatelessWidget`. You should handle storing your selected date range by yourself. An example is provided in the `example/` folder.
 
 The item builder for this widget contains a `SelectedDateRangeState` passed in its builder.
 
@@ -114,18 +116,18 @@ If this value is null, it means the item being built is not a selected item nor 
 
 If only one date is chosen, this corresponds to an unconnected start date. Note that there cannot be an unconnected end date since it is unbounded at this point.
 
-<img src="screenshots/selected_date_range_state_1.png" height=720/>
+<img src="https://github.com/pongloongyeat/calendar_components/assets/31680656/b41380d3-18df-484a-a348-02dbe2c3d503" height=720/>
 
 For a valid/bounded date range, it is possible to determine whether an item in the selected date range is a start date, end date or in between. Notice that the enum is called `startConnected` and `endConnected`. This is because the date range is now valid and you may want to render a joined selected item widget.
 
-<img src="screenshots/selected_date_range_state_2.png" height=720/>
+<img src="https://github.com/pongloongyeat/calendar_components/assets/31680656/b1c57756-aef5-4c1e-9d90-e8fe5aa6cd76" height=720/>
 
 Additionally, there is also a `startDateIsEndDate` enum value to describe that the start and end dates are the same. This is exposed in case you want to render this as a valid date range.
 
 Also included is an index that is passed in the item builder. This is typically useful for showing fade effects/gradients at the extreme ends of the calendar grid.
 
 ```dart
-CalendarComponentRangedSelectableDayGrid.overflow(
+CalendarComponentSelectableRangedDayGrid(
   selectedStartDate: ...,
   selectedEndDate: ...,
   currentMonth: DateTime.now(),
