@@ -28,7 +28,7 @@ extension on DateTime {
 }
 
 /// An enum describing what state a selected date is in inside a
-/// [CalendarComponentRangedSelectableDayGrid].
+/// [CalendarComponentSelectableRangedDayGrid].
 enum SelectedDateRangeState {
   /// The current position of the selected date is at the start/end date.
   startDate,
@@ -55,7 +55,7 @@ enum SelectedDateRangeState {
   bool get isSelected => this != inBetween;
 }
 
-/// A ranged selectable day grid of a calendar which allows for the selection
+/// A selectable ranged day grid of a calendar which allows for the selection
 /// of a range of dates. This widget is composed of [CalendarComponentDayGrid].
 /// This widget is a [StatelessWidget] and only forms as a basis for you to use
 /// in a [Widget].
@@ -64,35 +64,21 @@ enum SelectedDateRangeState {
 ///
 /// See also:
 /// - [CalendarComponentDayGrid] for a base grid to compose your calendar with.
-/// - [CalendarComponentSingleSelectableDayGrid] and
-/// [CalendarComponentMultipleSelectableDayGrid] for a selectable
+/// - [CalendarComponentSelectableDayGrid] for a selectable
 /// [CalendarComponentDayGrid].
-class CalendarComponentRangedSelectableDayGrid extends StatelessWidget {
-  /// Constructs the selectable ranged day grid with overflowed weeks.
-  CalendarComponentRangedSelectableDayGrid.overflow({
+class CalendarComponentSelectableRangedDayGrid extends StatelessWidget {
+  CalendarComponentSelectableRangedDayGrid({
     super.key,
     required DateTime? selectedStartDate,
     required DateTime? selectedEndDate,
     required this.currentMonth,
+    DateTime? startDate,
+    DateTime? endDate,
     required this.itemBuilder,
   })  : selectedStartDate = selectedStartDate?.toMidnight(),
         selectedEndDate = selectedEndDate?.toMidnight(),
-        showOverflowedWeeks = true,
-        startDate = null,
-        endDate = null;
-
-  /// Constructs the selectable ranged day grid with overflowed weeks.
-  CalendarComponentRangedSelectableDayGrid.noOverflow({
-    super.key,
-    required DateTime? selectedStartDate,
-    required DateTime? selectedEndDate,
-    required this.currentMonth,
-    required DateTime this.startDate,
-    required DateTime this.endDate,
-    required this.itemBuilder,
-  })  : selectedStartDate = selectedStartDate?.toMidnight(),
-        selectedEndDate = selectedEndDate?.toMidnight(),
-        showOverflowedWeeks = false;
+        startDate = startDate?.toMidnight(),
+        endDate = endDate?.toMidnight();
 
   /// The currently selected start date.
   final DateTime? selectedStartDate;
@@ -109,27 +95,15 @@ class CalendarComponentRangedSelectableDayGrid extends StatelessWidget {
   /// {@macro CalendarComponentDayGrid.endDate}
   final DateTime? endDate;
 
-  /// {@macro CalendarComponentDayGrid.showOverflowedWeeks}
-  final bool showOverflowedWeeks;
-
   /// {@macro CalendarComponentDayGrid.itemBuilder}
-  ///
-  /// {@macro CalendarComponentDayGrid.itemBuilderDisclaimer}
   final CalendarRangeDateGridSeletableItemBuilder itemBuilder;
 
   @override
   Widget build(BuildContext context) {
-    if (showOverflowedWeeks) {
-      return CalendarComponentDayGrid.overflow(
-        currentMonth: currentMonth,
-        itemBuilder: _itemBuilder,
-      );
-    }
-
-    return CalendarComponentDayGrid.noOverflow(
+    return CalendarComponentDayGrid(
       currentMonth: currentMonth,
-      startDate: startDate!,
-      endDate: endDate!,
+      startDate: startDate,
+      endDate: endDate,
       itemBuilder: _itemBuilder,
     );
   }

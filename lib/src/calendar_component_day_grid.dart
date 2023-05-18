@@ -48,76 +48,68 @@ extension on int {
 /// [Widget]s which you can use to create calendars for date selection, etc.
 ///
 /// {@template CalendarComponentDayGrid}
-/// The grid (with overflow) has a total of 42 items, consisting of 6 rows of
-/// 7 days each corresponding to a day in the current month and possibly the
-/// last few days of the previous month as well as the first few days of the
-/// next month.
+/// The grid (without [startDate] and [endDate] specified) has a total of 42
+/// items and contains underflow/overflowed days.
 ///
 /// For example:
 /// ```
+///     April 2023
+///
 /// M  T  W  T  F  S  S
 /// ====================
-/// 27 28 29 30 1  2  3
+/// 27 28 29 30 31 1  2
 /// ^^ ^^ ^^ ^^
-///  Overflow
+///  Underflow
 ///
-/// 4  5  6  7  8  9  10
-/// 11 12 13 14 15 16 17
-/// 18 19 20 21 22 23 24
-/// 25 26 27 28 29 30 31
+/// 3  4  5  6  7  8  9
+/// 10 11 12 13 14 15 16
+/// 17 18 19 20 21 22 23
+/// 24 25 26 27 28 29 30
 /// 1  2  3  4  5  6  7
 /// ^^ ^^ ^^ ^^ ^^ ^^ ^^
 ///      Overflow
 /// ====================
 /// ```
 ///
-/// If constructed with no overflow (or when [showOverflowedWeeks] is false),
-/// this removes the overflowed weeks where possible.
+/// To deal with overflow, you can specify your own date range for either/both
+/// [startDate] and [endDate]. For example, if [endDate] is specified to be
+/// 30th April 2023, the grid would only build items up till the last day of the
+/// week containing 30th April 2023.
 ///
-/// Referring to the example above:
 /// ```
+///     April 2023
+///
 /// M  T  W  T  F  S  S
 /// ====================
-/// 27 28 29 30 1  2  3
-/// 4  5  6  7  8  9  10
-/// 11 12 13 14 15 16 17
-/// 18 19 20 21 22 23 24
-/// 25 26 27 28 29 30 31
+/// 27 28 29 30 31 1  2
+/// 3  4  5  6  7  8  9
+/// 10 11 12 13 14 15 16
+/// 17 18 19 20 21 22 23
+/// 24 25 26 27 28 29 30
 /// ====================
 /// ```
 ///
 /// Notice that the overflowed week at the bottom has been removed but the
-/// overflowed days remain at the top since removing the whole week would mean
+/// underflowed days remain at the top since removing the whole week would mean
 /// removing the 1st and 2nd days of the month, which is part of the current
 /// month and shouldn't be removed.
 /// {@endtemplate}
 ///
 /// See also:
-/// - [CalendarComponentSingleSelectableDayGrid] and
-/// [CalendarComponentMultipleSelectableDayGrid] for a selectable
+/// - [CalendarComponentSelectableDayGrid] for a selectable
 /// [CalendarComponentDayGrid].
-/// - [CalendarComponentRangedSelectableDayGrid] for a selectable ranged
+/// - [CalendarComponentSelectableRangedDayGrid] for a selectable ranged
 /// [CalendarComponentDayGrid].
 class CalendarComponentDayGrid extends StatelessWidget {
-  /// Constructs the day grid with overflowed weeks.
-  CalendarComponentDayGrid.overflow({
+  CalendarComponentDayGrid({
     super.key,
     required DateTime currentMonth,
+    DateTime? startDate,
+    DateTime? endDate,
     required this.itemBuilder,
   })  : currentMonth = currentMonth.monthOnly(),
-        showOverflowedWeeks = true,
-        startDate = null,
-        endDate = null;
-
-  /// Constructs the day grid without overflowed weeks.
-  CalendarComponentDayGrid.noOverflow({
-    super.key,
-    required DateTime currentMonth,
-    required DateTime this.startDate,
-    required DateTime this.endDate,
-    required this.itemBuilder,
-  })  : currentMonth = currentMonth.monthOnly(),
-        showOverflowedWeeks = false;
+        startDate = startDate?.toMidnight(),
+        endDate = endDate?.toMidnight();
 
   /// {@template CalendarComponentDayGrid.currentMonth}
   /// The currently viewed month.
@@ -125,32 +117,19 @@ class CalendarComponentDayGrid extends StatelessWidget {
   final DateTime currentMonth;
 
   /// {@template CalendarComponentDayGrid.startDate}
-  /// If [showOverflowedWeeks] is true and this is specified, the calendar will
-  /// attempt to show the week containing [startDate] up until the week
-  /// containing [endDate], if specified.
+  /// If this is specified, the calendar's start date will be the first day of
+  /// the week containing [startDate].
   /// {@endtemplate}
   final DateTime? startDate;
 
   /// {@template CalendarComponentDayGrid.endDate}
-  /// If [showOverflowedWeeks] is true and this is specified, the calendar will
-  /// attempt to show the week containing [startDate], if specified, up until
+  /// If this is specified, the calendar's end date will be the last day of
   /// the week containing [endDate].
   /// @{endtemplate}
   final DateTime? endDate;
 
-  /// {@template CalendarComponentDayGrid.showOverflowedWeeks}
-  /// A boolean indicating whether or not to show overflowed weeks.
-  /// {@endtemplate}
-  final bool showOverflowedWeeks;
-
   /// {@template CalendarComponentDayGrid.itemBuilder}
   /// The builder for an item in the day grid.
-  /// {@endtemplate}
-  ///
-  /// {@template CalendarComponentDayGrid.itemBuilderDisclaimer}
-  /// This item could be a specific day of the current month or could possibly
-  /// be the last few days of the previous month or the first few days of the
-  /// next month.
   /// {@endtemplate}
   final CalendarGridItemBuilder itemBuilder;
 
@@ -202,39 +181,36 @@ class CalendarComponentDayGrid extends StatelessWidget {
       return currentMonth.copyWith(day: index - dayOffset + 1);
     });
 
-    if (!showOverflowedWeeks) {
-      final startDate = this.startDate;
-      final endDate = this.endDate;
+    final startDate = this.startDate;
+    final endDate = this.endDate;
 
-      final startDateIndex = startDate != null
-          ? dates.indexWhere((e) => e.isAtSameMomentAs(startDate))
-          : -1;
-      final endDateIndex = endDate != null
-          ? dates.indexWhere((e) => e.isAtSameMomentAs(endDate))
-          : -1;
+    final startDateIndex = startDate != null
+        ? dates.indexWhere((e) => e.isSameDayAs(startDate))
+        : -1;
+    final endDateIndex =
+        endDate != null ? dates.indexWhere((e) => e.isSameDayAs(endDate)) : -1;
 
-      dates = dates.sublist(
-        startDateIndex == -1
-            ? 0
+    dates = dates.sublist(
+      startDateIndex == -1
+          ? 0
 
-            // We use floor here as we want to make sure the week itself
-            // is included. For example,
-            //
-            // M  T  W  T  F  S  S
-            // 1  2  3  4  5  6  7
-            // 8  9  10 11 12 13 14
-            //
-            // if `startDate` is the 6th day, we want the index to be the index
-            // of the 1st day rather than the 8th day.
-            : startDateIndex.floorToNearest(numberOfColumns),
-        endDateIndex == -1
-            ? dates.length
+          // We use floor here as we want to make sure the week itself
+          // is included. For example,
+          //
+          // M  T  W  T  F  S  S
+          // 1  2  3  4  5  6  7
+          // 8  9  10 11 12 13 14
+          //
+          // if `startDate` is the 6th day, we want the index to be the index
+          // of the 1st day rather than the 8th day.
+          : startDateIndex.floorToNearest(numberOfColumns),
+      endDateIndex == -1
+          ? dates.length
 
-            // Similarly, we use ceil here to make sure the week itself is
-            // included if it is an earlier day in the week.
-            : (endDateIndex + 1).ceilToNearest(numberOfColumns),
-      );
-    }
+          // Similarly, we use ceil here to make sure the week itself is
+          // included if it is an earlier day in the week.
+          : (endDateIndex + 1).ceilToNearest(numberOfColumns),
+    );
 
     final columnChildren = <Row>[];
     final rowChildren = <Widget>[];

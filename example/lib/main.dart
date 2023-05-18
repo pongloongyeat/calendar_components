@@ -78,11 +78,10 @@ class _MyHomePageState extends State<MyHomePage> {
           return Column(
             children: [
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: horizontalPadding),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: horizontalPadding, vertical: 10),
                 child: CalendarComponentHeader(
-                  itemBuilder: (context, day) => Container(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
+                  itemBuilder: (context, day) => SizedBox(
                     width: itemExtent,
                     child: Text(
                       day.shorterName,
@@ -94,13 +93,14 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               Expanded(
                 child: ListView.separated(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: horizontalPadding),
                   itemBuilder: (context, index) {
                     final month =
                         DateTime(startDate.year, startDate.month + index);
 
                     return PartialCalendarDayGrid(
                       itemExtent: itemExtent,
-                      horizontalPadding: horizontalPadding,
                       currentMonth: month,
                       startDate: month.copyWith(
                           day: month.isSameMonthAs(startDate) ? 18 : 1),
@@ -169,7 +169,6 @@ class _MyHomePageState extends State<MyHomePage> {
 class PartialCalendarDayGrid extends StatelessWidget {
   const PartialCalendarDayGrid({
     super.key,
-    double? horizontalPadding,
     required this.itemExtent,
     required this.currentMonth,
     required this.startDate,
@@ -178,9 +177,8 @@ class PartialCalendarDayGrid extends StatelessWidget {
     required this.endDate,
     this.isDateAvailable,
     this.onDateTapped,
-  }) : horizontalPadding = horizontalPadding ?? 0;
+  });
 
-  final double horizontalPadding;
   final double itemExtent;
   final DateTime currentMonth;
   final DateTime startDate;
@@ -214,8 +212,7 @@ class PartialCalendarDayGrid extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding:
-              EdgeInsets.only(top: 16, bottom: 12, left: horizontalPadding),
+          padding: const EdgeInsets.only(top: 16, bottom: 12),
           child: Text(
             '$month $year',
             style: const TextStyle(
@@ -224,16 +221,13 @@ class PartialCalendarDayGrid extends StatelessWidget {
             ),
           ),
         ),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-          child: CalendarComponentRangedSelectableDayGrid.noOverflow(
-            currentMonth: currentMonth,
-            startDate: startDate,
-            endDate: endDate,
-            selectedStartDate: selectedStartDate,
-            selectedEndDate: selectedEndDate,
-            itemBuilder: _itemBuilder,
-          ),
+        CalendarComponentSelectableRangedDayGrid(
+          currentMonth: currentMonth,
+          startDate: startDate,
+          endDate: endDate,
+          selectedStartDate: selectedStartDate,
+          selectedEndDate: selectedEndDate,
+          itemBuilder: _itemBuilder,
         ),
       ],
     );

@@ -10,7 +10,7 @@ void main() {
     final currentMonth = DateTime(2023, 4);
 
     final widget = TesterHelperWidget(
-      child: CalendarComponentDayGrid.overflow(
+      child: CalendarComponentDayGrid(
         currentMonth: currentMonth,
         itemBuilder: (context, date, index) => WidgetWithMetadata(
           metadata: date,
@@ -59,7 +59,7 @@ void main() {
     });
 
     testWidgets(
-        'does not show overflowed weeks if showOverflowedWeeks is false',
+        'does not show overflowed weeks if start and end dates are specified',
         (tester) async {
       final currentMonth = DateTime(2023, 4);
       final startDate = DateTime(2023, 4, 14);
@@ -69,7 +69,7 @@ void main() {
       const numberOfDays = numberOfWeeks * DateTime.daysPerWeek;
 
       final widget = TesterHelperWidget(
-        child: CalendarComponentDayGrid.noOverflow(
+        child: CalendarComponentDayGrid(
           currentMonth: currentMonth,
           startDate: startDate,
           endDate: endDate,
@@ -82,15 +82,14 @@ void main() {
     });
 
     testWidgets(
-        'shows all dates if showOverflowedWeeks is false but start and '
-        'end dates fall on the first and last days of the grid',
+        'shows all weeks between the weeks containing startDate and endDate',
         (tester) async {
       final currentMonth = DateTime(2023, 4);
       final startDate = DateTime(2023, 4);
       final endDate = DateTime(2023, 4, 30);
 
       final widget = TesterHelperWidget(
-        child: CalendarComponentDayGrid.noOverflow(
+        child: CalendarComponentDayGrid(
           currentMonth: currentMonth,
           startDate: startDate,
           endDate: endDate,

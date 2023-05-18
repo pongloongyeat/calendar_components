@@ -18,7 +18,7 @@ void main() {
       final endDate = currentMonth.lastDateOfCurrentMonth();
 
       final widget = TesterHelperWidget(
-        child: CalendarComponentSingleSelectableDayGrid.noOverflow(
+        child: CalendarComponentSelectableDayGrid.single(
           selectedDate: null,
           currentMonth: currentMonth,
           startDate: startDate,
@@ -44,7 +44,7 @@ void main() {
       );
     });
 
-    testWidgets('show selected date if selectedDate is specified',
+    testWidgets('shows selected date if selectedDate is specified',
         (tester) async {
       final currentMonth = DateTime.now().monthOnly();
       final startDate = currentMonth.copyWith(day: 1);
@@ -54,7 +54,7 @@ void main() {
       );
 
       final widget = TesterHelperWidget(
-        child: CalendarComponentSingleSelectableDayGrid.noOverflow(
+        child: CalendarComponentSelectableDayGrid.single(
           selectedDate: selectedDate,
           currentMonth: currentMonth,
           startDate: startDate,
@@ -86,15 +86,15 @@ void main() {
   });
 
   group('CalendarComponentSelectableDayGrid.multiple', () {
-    testWidgets('does not show selected dates if selectedDates is null',
+    testWidgets('does not show selected dates if selectedDates is empty',
         (tester) async {
       final currentMonth = DateTime.now().monthOnly();
       final startDate = currentMonth.copyWith(day: 1);
       final endDate = currentMonth.lastDateOfCurrentMonth();
 
       final widget = TesterHelperWidget(
-        child: CalendarComponentMultipleSelectableDayGrid.noOverflow(
-          selectedDates: null,
+        child: CalendarComponentSelectableDayGrid.multiple(
+          selectedDates: const [],
           currentMonth: currentMonth,
           startDate: startDate,
           endDate: endDate,
@@ -134,7 +134,7 @@ void main() {
       ];
 
       final widget = TesterHelperWidget(
-        child: CalendarComponentMultipleSelectableDayGrid.noOverflow(
+        child: CalendarComponentSelectableDayGrid.multiple(
           selectedDates: selectedDates,
           currentMonth: currentMonth,
           startDate: startDate,

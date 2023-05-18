@@ -191,7 +191,7 @@ Widget _buildWidget({
   DateTime? selectedEndDate,
 }) {
   return TesterHelperWidget(
-    child: CalendarComponentRangedSelectableDayGrid.noOverflow(
+    child: CalendarComponentSelectableRangedDayGrid(
       currentMonth: currentMonth,
       startDate: startDate,
       endDate: endDate,

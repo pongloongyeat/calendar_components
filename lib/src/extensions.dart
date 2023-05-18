@@ -9,6 +9,11 @@ extension DateTimeExtensions on DateTime {
     return copyWith(day: 1).toMidnight();
   }
 
+  /// Returns true if this occurs at the same moment as [other].
+  bool isSameDayAs(DateTime other) {
+    return year == other.year && month == other.month && day == other.day;
+  }
+
   /// Returns the last day of the current month.
   DateTime lastDateOfCurrentMonth() {
     return DateTime(year, month + 1)
