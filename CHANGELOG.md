@@ -8,6 +8,11 @@
 ### Others
 -->
 
+## 0.2.0
+
+### Features
+- Rework API to remove use of `.overflow` and `.noOverflow` constructors.
+
 ## 0.1.0
 
 ### Features
