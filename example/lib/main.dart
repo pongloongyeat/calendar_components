@@ -221,13 +221,29 @@ class PartialCalendarDayGrid extends StatelessWidget {
             ),
           ),
         ),
-        CalendarComponentSelectableRangedDayGrid(
+        CustomisableSelectableDayGrid(
           currentMonth: currentMonth,
-          startDate: startDate,
-          endDate: endDate,
-          selectedStartDate: selectedStartDate,
-          selectedEndDate: selectedEndDate,
-          itemBuilder: _itemBuilder,
+          endDate: currentMonth.lastDateOfCurrentMonth(),
+          useInkWell: false,
+          itemWidth: itemExtent,
+          itemHeight: itemExtent,
+          itemPadding: const EdgeInsets.all(4),
+          borderRadius: BorderRadius.circular(itemExtent / 2),
+          selectedBorderRadius: BorderRadius.circular(itemExtent / 2),
+          selectedDecoration: BoxDecoration(
+            color: Colors.black,
+            borderRadius: BorderRadius.circular(itemExtent / 2),
+          ),
+          selectedStyle: const TextStyle(
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+          ),
+          disabledStyle: const TextStyle(
+            fontWeight: FontWeight.w700,
+            color: Color(0xffd8d8d8),
+          ),
+          predicate: isDateAvailable,
+          onDateSelected: print,
         ),
       ],
     );
