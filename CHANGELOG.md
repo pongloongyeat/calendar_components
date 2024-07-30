@@ -8,10 +8,10 @@
 ### Others
 -->
 
-## 0.2.0
+## Next
 
-### Features
-- Rework API to remove use of `.overflow` and `.noOverflow` constructors.
+### Others
+- Updated README image URLs.
 
 ## 0.1.0
 

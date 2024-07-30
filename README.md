@@ -31,13 +31,13 @@ CalendarComponentHeader(
 
 The basic calendar grid. If the start and end dates are not specified, the calendar grid is fully filled with 6 rows of 7 days with underflowed/overflowed dates. An example of underflow/overflow:
 
-<img src="https://github.com/pongloongyeat/calendar_components/assets/31680656/4a21304a-a121-4f64-b120-f0e827cfc65a" height=720/>
+<img src="https://raw.githubusercontent.com/pongloongyeat/calendar_components/43664a3cec4034f0ed52ab409401559ff0807375/screenshots/overflow.png" height=720/>
 
 To deal with overflow, you can specify your own date range for either/both start and end dates. For example, if the end date is 30th April 2023, the grid would only build items up till the last day of the week containing 30th April 2023.
 
 Referring to the example above:
 
-<img src="https://github.com/pongloongyeat/calendar_components/assets/31680656/4f47553e-7a6c-415a-b4a0-7b2580795117" height=720/>
+<img src="https://raw.githubusercontent.com/pongloongyeat/calendar_components/43664a3cec4034f0ed52ab409401559ff0807375/screenshots/no_overflow.png" height=720/>
 
 Notice that the overflowed week at the bottom has been removed but the underflowed days remain at the top since removing the whole week would mean removing the 1st and 2nd days of the month, which is part of the current month and shouldn't be removed.
 
@@ -116,11 +116,11 @@ If this value is null, it means the item being built is not a selected item nor 
 
 If only one date is chosen, this corresponds to an unconnected start date. Note that there cannot be an unconnected end date since it is unbounded at this point.
 
-<img src="https://github.com/pongloongyeat/calendar_components/assets/31680656/b41380d3-18df-484a-a348-02dbe2c3d503" height=720/>
+<img src="https://raw.githubusercontent.com/pongloongyeat/calendar_components/43664a3cec4034f0ed52ab409401559ff0807375/screenshots/selected_date_range_state_1.png" height=720/>
 
 For a valid/bounded date range, it is possible to determine whether an item in the selected date range is a start date, end date or in between. Notice that the enum is called `startConnected` and `endConnected`. This is because the date range is now valid and you may want to render a joined selected item widget.
 
-<img src="https://github.com/pongloongyeat/calendar_components/assets/31680656/b1c57756-aef5-4c1e-9d90-e8fe5aa6cd76" height=720/>
+<img src="https://raw.githubusercontent.com/pongloongyeat/calendar_components/43664a3cec4034f0ed52ab409401559ff0807375/screenshots/selected_date_range_state_2.png" height=720/>
 
 Additionally, there is also a `startDateIsEndDate` enum value to describe that the start and end dates are the same. This is exposed in case you want to render this as a valid date range.
 
